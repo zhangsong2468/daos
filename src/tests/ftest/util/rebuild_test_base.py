@@ -44,7 +44,9 @@ class RebuildTestBase(TestWithServers):
         # Get the number of targets per engine for pool info calculations
         self.targets = self.params.get("targets", "/run/server_config/*")
 
-        self.server_count = len(self.hostlist_servers)
+        engines_per_host = self.params.get(
+            "engines_per_host", "/run/server_config/*", 1)
+        self.server_count = len(self.hostlist_servers) * engines_per_host
 
     def setup_test_pool(self):
         """Define a TestPool object."""
