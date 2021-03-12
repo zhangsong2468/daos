@@ -23,11 +23,8 @@ distro_custom() {
                /etc/profile.d/lmod.sh;                                        \
     fi
 
-    # force install of avocado 52.1
-    dnf -y erase avocado{,-common} \
-           python2-avocado{,-plugins-{output-html,varianter-yaml-to-mux}}
-    dnf -y install {avocado-common,python2-avocado{,-plugins-{output-html,varianter-yaml-to-mux}}}-52.1
-
+    # show version of avocado 52.1
+    rpm -qa | grep -i avocado || true
 }
 
 post_provision_config_nodes() {
