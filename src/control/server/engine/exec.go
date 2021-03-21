@@ -93,7 +93,7 @@ func (r *Runner) Start(ctx context.Context, errOut chan<- error) error {
 	if err != nil {
 		return err
 	}
-	env = mergeEnvVars(env, cleanEnvVars(os.Environ(), r.Config.EnvPassThrough))
+	env = mergeEnvVars(cleanEnvVars(os.Environ(), r.Config.EnvPassThrough), env)
 
 	go func() {
 		errOut <- r.run(ctx, args, env)

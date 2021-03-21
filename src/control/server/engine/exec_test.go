@@ -122,7 +122,9 @@ func TestRunnerNormalExit(t *testing.T) {
 	os.Setenv(testModeVar, "RunnerNormalExit")
 	// verify that bad user env is scrubbed
 	os.Setenv("FI_VERBS_PREFER_XRC", "1")
-	// verify that allowed user env is passed through
+	// verify that allowed user env gets overridden by config
+	os.Setenv("OFI_INTERFACE", "bob0")
+	// verify that allowed user env without a config override is passed through
 	allowedUserEnv := "MOOD"
 	allowedUserVal := "happy"
 	os.Setenv(allowedUserEnv, allowedUserVal)
@@ -131,7 +133,8 @@ func TestRunnerNormalExit(t *testing.T) {
 	defer common.ShowBufferOnFailure(t, buf)
 
 	cfg := NewConfig().
-		WithEnvPassThrough(testModeVar, "LD_LIBRARY_PATH", allowedUserEnv).
+		WithEnvPassThrough(testModeVar, "LD_LIBRARY_PATH",
+			"OFI_INTERFACE", allowedUserEnv).
 		WithTargetCount(42).
 		WithHelperStreamCount(1).
 		WithFabricInterface("qib0").
