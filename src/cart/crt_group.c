@@ -30,6 +30,7 @@ crt_li_destroy(struct crt_lookup_item *li)
 	D_ASSERT(li->li_ref == 0);
 	D_ASSERT(li->li_initialized == 1);
 
+	D_INFO("Destroying hg_cache entry for rank=%d\n", li->li_rank);
 	for (i = 0; i < CRT_SRV_CONTEXT_NUM; i++) {
 		if (li->li_tag_addr[i] != NULL)
 			D_ERROR("tag %d, li_tag_addr not freed.\n", i);
@@ -538,8 +539,11 @@ crt_grp_lc_uri_remove(struct crt_grp_priv *passed_grp_priv, int ctx_idx,
 
 	li = crt_li_link2ptr(rlink);
 
+	D_INFO("Removing rank=%d from caches\n", rank);
 	for (i = 0; i < CRT_SRV_CONTEXT_NUM; i++) {
 		if (li->li_tag_addr[i]) {
+			D_INFO("Address removed for rank=%d context=%d\n",
+			       rank, i);
 			crt_hg_addr_free(&ctx->cc_hg_ctx, li->li_tag_addr[i]);
 		}
 	}
@@ -2399,6 +2403,9 @@ crt_group_primary_add_internal(struct crt_grp_priv *grp_priv,
 {
 	int rc;
 
+	D_INFO("Primary group addition; rank=%d:%d, uri='%s'\n",
+	       rank, tag, uri);
+
 	if (!grp_priv->gp_primary) {
 		D_ERROR("Only available for primary groups\n");
 		D_GOTO(out, rc = -DER_INVAL);
@@ -2528,6 +2535,9 @@ crt_group_rank_remove_internal(struct crt_grp_priv *grp_priv, d_rank_t rank)
 	struct crt_rank_mapping *rm;
 	int			i;
 	int			rc = 0;
+
+        D_INFO("Rank removal; rank=%d grp_priv->gp_primary=%d\n",
+	       rank, grp_priv->gp_primary);
 
 	if (grp_priv->gp_primary) {
 		rlink = d_hash_rec_find(&grp_priv->gp_uri_lookup_cache,

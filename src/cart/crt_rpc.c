@@ -1174,6 +1174,9 @@ crt_req_hg_addr_lookup(struct crt_rpc_priv *rpc_priv)
 
 	crt_ctx = rpc_priv->crp_pub.cr_ctx;
 
+        D_INFO("Performing HG_ADDR lookup for %s\n",
+	       rpc_priv->crp_tgt_uri);
+
 	hg_ret = HG_Addr_lookup2(crt_ctx->cc_hg_ctx.chc_hgcla,
 				 rpc_priv->crp_tgt_uri, &hg_addr);
 	if (hg_ret != HG_SUCCESS) {
