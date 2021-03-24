@@ -3315,6 +3315,8 @@ crt_group_primary_modify(crt_group_t *grp, crt_context_t *ctxs, int num_ctxs,
 	for (i = 0; i < to_add->rl_nr; i++) {
 		rank = to_add->rl_ranks[i];
 
+		D_INFO("Adding rank=%d uri=%s\n", rank, uris[uri_idx[i]]);
+
 		rc = grp_add_to_membs_list(grp_priv, rank);
 		if (rc != 0) {
 			D_ERROR("grp_add_to_memb_list %d failed; rc=%d\n",
