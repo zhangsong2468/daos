@@ -1848,8 +1848,14 @@ pool_connect_iv_dist(struct pool_svc *svc, uuid_t pool_hdl,
 
 	rc = ds_pool_iv_conn_hdl_update(svc->ps_pool, pool_hdl, flags,
 					sec_capas, cred);
-	if (rc)
+	if (rc) {
+		if (rc == -DER_SHUTDOWN) {
+			D_DEBUG(DF_DSMS, DF_UUID":"DF_UUID" some ranks stop.\n",
+				DP_UUID(svc->ps_uuid), DP_UUID(pool_hdl));
+			rc = 0;
+		}
 		D_GOTO(out, rc);
+	}
 out:
 	D_DEBUG(DF_DSMS, DF_UUID": bcasted: "DF_RC"\n", DP_UUID(svc->ps_uuid),
 		DP_RC(rc));
@@ -3975,7 +3981,7 @@ ds_pool_update_internal(uuid_t pool_uuid, struct pool_target_id_list *tgts,
 		 * during reintegration/addition
 		 */
 		rc = ds_rebuild_schedule(svc->ps_pool, map_version, tgts,
-					 RB_OP_RECLAIM);
+					 RB_OP_RECLAIM, 0);
 		if (rc != 0) {
 			D_ERROR("failed to schedule reclaim rc: "DF_RC"\n",
 				DP_RC(rc));
@@ -4377,7 +4383,8 @@ ds_pool_update(uuid_t pool_uuid, crt_opcode_t opc,
 	D_DEBUG(DF_DSMS, "map ver %u/%u\n", map_version ? *map_version : -1,
 		tgt_map_ver);
 	if (tgt_map_ver != 0) {
-		rc = ds_rebuild_schedule(pool, tgt_map_ver, &target_list, op);
+		rc = ds_rebuild_schedule(pool, tgt_map_ver, &target_list, op,
+					 0);
 		if (rc != 0) {
 			D_ERROR("rebuild fails rc: "DF_RC"\n", DP_RC(rc));
 			D_GOTO(out, rc);
@@ -4507,7 +4514,7 @@ pool_extend_internal(uuid_t pool_uuid, struct rsvc_hint *hint,
 	 * Extend the pool map directly - this is more complicated than other
 	 * operations which are handled within ds_pool_update()
 	 */
-	rc = pool_extend_map(&tx, svc, ndomains, target_uuids,
+	rc = pool_extend_map(&tx, svc, nnodes, target_uuids,
 			     rank_list, ndomains, domains,
 			     &updated, map_version_p, hint);
 
@@ -4524,7 +4531,7 @@ pool_extend_internal(uuid_t pool_uuid, struct rsvc_hint *hint,
 
 	/* Schedule an extension rebuild for those targets */
 	rc = ds_rebuild_schedule(svc->ps_pool, *map_version_p, &tgts,
-				 RB_OP_EXTEND);
+				 RB_OP_EXTEND, 0);
 	if (rc != 0) {
 		D_ERROR("failed to schedule extend rc: "DF_RC"\n", DP_RC(rc));
 		D_GOTO(out_lock, rc);
@@ -4560,7 +4567,8 @@ ds_pool_extend_handler(crt_rpc_t *rpc)
 	ndomains = in->pei_ndomains;
 	domains = in->pei_domains.ca_arrays;
 
-	rc = pool_extend_internal(pool_uuid, &out->peo_op.po_hint, ndomains,
+	rc = pool_extend_internal(pool_uuid, &out->peo_op.po_hint,
+				  rank_list.rl_nr,
 				  target_uuids, &rank_list, ndomains, domains,
 				  &out->peo_op.po_map_version);
 
