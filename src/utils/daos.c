@@ -1616,7 +1616,7 @@ main(int argc, char *argv[])
 
 	rc = daos_init();
 	if (rc != 0) {
-		fprintf(stderr, "failed to initialize daos: %s (%d)\n",
+		fprintf(stderr, "failed to initialize DAOS: %s (%d)\n",
 			d_errdesc(rc), rc);
 		return 1;
 	}
