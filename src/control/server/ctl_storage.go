@@ -183,6 +183,8 @@ func (c *StorageControlService) checkCfgBdevs(scanResp *storage.BdevScanResponse
 
 // Setup delegates to Storage implementation's Setup methods.
 func (c *StorageControlService) Setup() error {
+	// Don't scan anything.
+	return nil
 	if _, err := c.ScmScan(storage.ScmScanRequest{}); err != nil {
 		c.log.Debugf("%s\n", errors.Wrap(err, "Warning, SCM Scan"))
 	}
