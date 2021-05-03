@@ -133,3 +133,23 @@ class ErasureCodeIor(ServerFillUp):
                 self.start_ior_load(operation='Read', percent=1,
                                     create_cont=False)
                 con_count += 1
+
+    def write_single_type_dataset(self):
+        """Write single type data set with different EC object and
+        different sizes."""
+        for oclass in self.obj_class:
+            for sizes in self.ior_chu_trs_blk_size:
+                # Skip the object type if server count does not meet the minimum
+                # EC object server count
+                if oclass[1] > self.server_count:
+                    continue
+                self.ior_param_update(oclass, sizes)
+
+                # Create the new container with correct redundancy factor
+                # for EC object type
+                self.ec_contaier_create(oclass[0])
+                self.update_ior_cmd_with_pool(create_cont=False)
+                # Start IOR Write
+                self.container.uuid = self.ec_container.uuid
+                print("===SAMIR---MAIN CODE------")
+                self.cont_uuid.append(self.ior_cmd.dfs_cont.value)
