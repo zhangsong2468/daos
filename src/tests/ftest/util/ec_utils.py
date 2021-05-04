@@ -9,7 +9,9 @@ import re
 from nvme_utils import ServerFillUp
 from daos_utils import DaosCommand
 from test_utils_container import TestContainer
-
+from pydaos.raw import DaosApiError
+from test_utils_pool import TestPool
+from apricot import TestWithServers
 
 class ErasureCodeIor(ServerFillUp):
     # pylint: disable=too-many-ancestors
@@ -134,22 +136,30 @@ class ErasureCodeIor(ServerFillUp):
                                     create_cont=False)
                 con_count += 1
 
-    def write_single_type_dataset(self):
-        """Write single type data set with different EC object and
-        different sizes."""
-        for oclass in self.obj_class:
-            for sizes in self.ior_chu_trs_blk_size:
-                # Skip the object type if server count does not meet the minimum
-                # EC object server count
-                if oclass[1] > self.server_count:
-                    continue
-                self.ior_param_update(oclass, sizes)
+class ErasureCodeSingle(TestWithServers):
+    # pylint: disable=too-many-ancestors
+    """
 
-                # Create the new container with correct redundancy factor
-                # for EC object type
-                self.ec_contaier_create(oclass[0])
-                self.update_ior_cmd_with_pool(create_cont=False)
-                # Start IOR Write
-                self.container.uuid = self.ec_container.uuid
-                print("===SAMIR---MAIN CODE------")
-                self.cont_uuid.append(self.ior_cmd.dfs_cont.value)
+    Class to used for EC testing.
+    It will get the object types from yaml file write the IOR data set with
+    IOR.
+
+    """
+    def setUp(self):
+        """Set Up nodes for each test case."""
+        super().setUp()
+        self.pool = TestPool(self.context, self.get_dmg_command())
+        self.pool.get_params(self)
+        # Create a pool
+        self.pool.create()
+
+        # display available space before write
+        self.pool.display_pool_daos_space("before writes")
+        self.pool.connect()
+        
+        # create container
+        self.container = TestContainer(self.pool)
+        self.container.get_params(self)
+        self.container.create()
+        self.container.open()
+

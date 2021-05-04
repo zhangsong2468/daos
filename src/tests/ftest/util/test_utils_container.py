@@ -121,6 +121,7 @@ class TestContainerData():
             akey = get_random_bytes(akey_size, self.get_akeys())
             dkey = get_random_bytes(dkey_size, self.get_dkeys())
             if data_array_size == 0:
+                print("---SAMIR- Writing-Single-Type--\n")
                 data = get_random_bytes(data_size)
             else:
                 data = [
@@ -131,6 +132,7 @@ class TestContainerData():
             # Verify the data was written correctly
             data_read = self.read_record(
                 container, akey, dkey, data_size, data_array_size)
+            print("Write Data = {}".format(data))
             if data != data_read:
                 raise DaosTestError(
                     "Written data confirmation failed:"
@@ -220,7 +222,7 @@ class TestContainerData():
                         ", punched={}) from".format(record_info["punched"])))
                 status = False
                 continue
-
+            print("Read Data = {}".format(actual))
             expect = b"" if record_info["punched"] else record_info["data"]
             if actual != expect:
                 self.log.error(
