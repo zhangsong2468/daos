@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 """
 import re
+import time
 
 from nvme_utils import ServerFillUp
 from daos_utils import DaosCommand
@@ -12,6 +13,20 @@ from test_utils_container import TestContainer
 from pydaos.raw import DaosApiError
 from test_utils_pool import TestPool
 from apricot import TestWithServers
+
+def get_data_parity_number(oclass):
+    """Return EC Object Data and Parity count.
+    Args:
+        oclass(string): EC Object type.
+    return:
+        result[list]: Data and Parity numbers from object type
+    """
+    if 'EC' not in oclass:
+        log.error("Provide EC Object type only and not %s", str(oclass))
+        return 0
+
+    tmp = re.findall(r'\d+', oclass)
+    return {'data': tmp[0], 'parity': tmp[1]}
 
 class ErasureCodeIor(ServerFillUp):
     # pylint: disable=too-many-ancestors
@@ -45,7 +60,7 @@ class ErasureCodeIor(ServerFillUp):
         self.create_pool_max_size()
         self.update_ior_cmd_with_pool()
 
-    def ec_contaier_create(self, oclass):
+    def ec_container_create(self, oclass):
         """Create the container for EC object"""
         # Get container params
         self.ec_container = TestContainer(
@@ -54,27 +69,11 @@ class ErasureCodeIor(ServerFillUp):
         self.ec_container.oclass.update(oclass)
         # update object class for container create, if supplied
         # explicitly.
-        ec_object = self.get_data_parity_number(oclass)
+        ec_object = get_data_parity_number(oclass)
         self.ec_container.properties.update("rf:{}".format(ec_object['parity']))
 
         # create container
         self.ec_container.create()
-
-    def get_data_parity_number(self, oclass):
-        """Return EC Object Data and Parity count.
-
-        Args:
-            oclass(string): EC Object type.
-        return:
-            result[list]: Data and Parity numbers from object type
-        """
-        if 'EC' not in oclass:
-            self.log.error("Provide EC Object type only and not %s",
-                           str(oclass))
-            return 0
-
-        tmp = re.findall(r'\d+', oclass)
-        return {'data': tmp[0], 'parity': tmp[1]}
 
     def ior_param_update(self, oclass, sizes):
         """Update the IOR command parameters.
@@ -101,7 +100,7 @@ class ErasureCodeIor(ServerFillUp):
 
                 # Create the new container with correct redundancy factor
                 # for EC object type
-                self.ec_contaier_create(oclass[0])
+                self.ec_container_create(oclass[0])
                 self.update_ior_cmd_with_pool(create_cont=False)
                 # Start IOR Write
                 self.container.uuid = self.ec_container.uuid
@@ -145,6 +144,11 @@ class ErasureCodeSingle(TestWithServers):
     IOR.
 
     """
+    def __init__(self, *args, **kwargs):
+        """Initialize a ServerFillUp object."""
+        super().__init__(*args, **kwargs)
+        self.ec_container = None
+
     def setUp(self):
         """Set Up nodes for each test case."""
         super().setUp()
@@ -156,10 +160,20 @@ class ErasureCodeSingle(TestWithServers):
         # display available space before write
         self.pool.display_pool_daos_space("before writes")
         self.pool.connect()
-        
+        time.sleep(30)
+
+    def ec_container_create(self):
+        """Create the container for EC object"""
+        # Get container params
         # create container
-        self.container = TestContainer(self.pool)
-        self.container.get_params(self)
-        self.container.create()
-        self.container.open()
+        self.ec_container = TestContainer(self.pool)
+        self.ec_container.get_params(self)
+        self.ec_container.create()
+        self.ec_container.open()
+        time.sleep(30)
+
+    def ec_container_destroy(self):
+        """Destroy the container for EC object"""
+        self.ec_container.destroy()
+
 

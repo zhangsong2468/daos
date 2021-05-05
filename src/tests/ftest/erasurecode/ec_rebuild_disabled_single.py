@@ -31,13 +31,17 @@ class EcDisabledRebuildSingle(ErasureCodeSingle):
         """
         # Disabled pool Rebuild
         self.pool.set_property("self_heal", "exclude")
-
+        time.sleep(30)
         print("---------SAMIR---- write_objects \n")
-        self.container.write_objects()
-
+        self.ec_container_create()
+        self.ec_container.write_objects(obj_class="OC_EC_2P1G1")
+        self.pool.display_pool_daos_space("After writes")
+        time.sleep(60)
         print("---------SAMIR---- read_objects \n")
-        self.container.read_objects()
-
+        self.ec_container.read_objects()
+        time.sleep(60)
+        self.pool.display_pool_daos_space("After Read")
+        self.ec_container_destroy()
         # Write the IOR data set with given all the EC object type
         ## self.write_single_type_dataset()
 
