@@ -18,7 +18,6 @@ class EcDisabledRebuild(ErasureCodeIor):
     """
     def setUp(self):
         super().setUp()
-        self.setup_ior()
 
     #@skipForTicket("DAOS-6660")
     def test_ec_degrade(self):

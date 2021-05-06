@@ -5,27 +5,23 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 '''
 import time
-from ec_utils import ErasureCodeIor
-from apricot import skipForTicket
+from ec_utils import ErasureCodeSingle
 
-class EcDisabledRebuildSingle(ErasureCodeIor):
+class EcDisabledRebuildSingle(ErasureCodeSingle):
     # pylint: disable=too-many-ancestors
     """
-    Test Class Description: To validate Erasure code object data after killing
-                            single server when pool rebuild is off.
+    Test Class Description: To validate Erasure code object fir single data
+            type, after killing servers when pool rebuild is off.
     :avocado: recursive
     """
-    def setUp(self):
-        super().setUp()
-        self.setup_single_type()
-
     def test_ec_degrade_single_value(self):
         """Jira ID: DAOS-7314.
 
         Test Description: Test Erasure code object for single type.
-        Use Case: Create the pool, disabled rebuild, Write data with single
-                  type with EC object type class. kill single server,
-                  read data and verified.
+        Use Case: Create the pool, disabled rebuild, Write single data
+                  type with EC object classes. kill single server,
+                  read data and verified, kill another server,
+                  read data with parity 2 and verify the content.
 
         :avocado: tags=all,full_regression
         :avocado: tags=hw,large,ib2
@@ -35,30 +31,30 @@ class EcDisabledRebuildSingle(ErasureCodeIor):
         """
         # Disabled pool Rebuild
         self.pool.set_property("self_heal", "exclude")
-        #time.sleep(30)
 
-        # Write single type data set with given all the EC object type
+        # Write single type data set with all the EC object type
         self.write_single_type_dataset()
-        self.pool.display_pool_daos_space("After writes")
 
         # Read data set with given all the EC object type
         self.read_single_type_dataset()
-        self.pool.display_pool_daos_space("After Read")
 
-        # Kill the last server rank and wait for 20 seconds, Rebuild is disabled
-        # so data should not be rebuild
-        self.server_managers[0].stop_ranks([self.server_count - 1], self.d_log, force=True)
-        time.sleep(20)
+        # Kill the last server rank and wait for 20 seconds,
+        # Rebuild is disabled so data should not be rebuild
+        self.server_managers[0].stop_ranks(
+            [self.server_count - 1], self.d_log, force=True)
+        time.sleep(10)
 
-        # Read IOR data and verify for different EC object and different sizes
-        # written before killing the single server
+        # Read data set and verify for different EC object and different sizes
         self.read_single_type_dataset()
 
         # Kill the another server rank and wait for 20 seconds,Rebuild will
-        # not happens because i's disabled.Read/verify data with Parity 2.
-        self.server_managers[0].stop_ranks([self.server_count - 2], self.d_log, force=True)
-        time.sleep(20)
+        # not happens because it's disabled.
+        # Read and verify data with Parity 2.
+        self.server_managers[0].stop_ranks(
+            [self.server_count - 2], self.d_log, force=True)
+
 
         # Read IOR data and verify for different EC object and different sizes
         # written before killing the single server
         self.read_single_type_dataset(parity=2)
+

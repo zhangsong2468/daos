@@ -4,11 +4,21 @@ hosts:
       test_servers:
         - server-A
         - server-B
+    6_server:
+      test_servers:
+        - server-A
+        - server-B
+        - server-C
+    10_server:
+      test_servers:
+        - server-A
+        - server-B
+        - server-C
+        - server-D
+        - server-E
   test_clients:
     - client-A
-    - client-B
-    - client-C
-timeout: 900
+timeout: 200
 server_config:
   engines_per_host: 2
   name: daos_server
@@ -19,6 +29,7 @@ server_config:
       fabric_iface: eth0
       fabric_iface_port: 31416
       log_file: daos_server0.log
+      log_mask: DEBUG
       bdev_class: nvme
       bdev_list: ["aaaa:aa:aa.a"]
       scm_class: ram
@@ -30,6 +41,7 @@ server_config:
       fabric_iface: eth0
       fabric_iface_port: 31517
       log_file: daos_server1.log
+      log_mask: DEBUG
       bdev_class: nvme
       bdev_list: ["bbbb:bb:bb.b"]
       scm_class: ram
@@ -38,7 +50,7 @@ server_config:
 pool:
     mode: 146
     name: daos_server
-    scm_size: 8G
+    scm_size: 16G
     nvme_size: 500G
     svcn: 1
     control_method: dmg
@@ -47,13 +59,13 @@ container:
     type: POSIX
     control_method: API
     single_data_set:
-      # [object_qty, record_qty, akey, dkey, data_size]
+      # [object_qty, record_qty, dkey, akey, data_size]
       - [1, 1, 1, 1, 4194304]
 objectclass:
     dfs_oclass:
       #- [EC_Object_Class, Minimum number of servers]
-      - ["EC_2P1G1", 4]
-      - ["EC_2P2G1", 4]
-      #- ["EC_4P1G1", 6]
-      #- ["EC_4P2G1", 6]
-      #- ["EC_8P2G1", 10]
+      - ["OC_EC_2P1G1", 4]
+      - ["OC_EC_2P2G1", 4]
+      - ["OC_EC_4P1G1", 6]
+      - ["OC_EC_4P2G1", 6]
+      - ["OC_EC_8P2G1", 10]

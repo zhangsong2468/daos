@@ -89,6 +89,8 @@ class TestContainerData():
                 (self.obj) = \
                     container.container.write_an_array_value(**kwargs)
             else:
+                #print(" -- SAMIR -- Write Single value dkey = {}, akey = {} and data = {}\n"
+                #      .format(dkey, akey, data))
                 kwargs["thedata"] = data
                 kwargs["size"] = len(data)
                 self._log_method("write_an_obj", kwargs)
@@ -121,7 +123,6 @@ class TestContainerData():
             akey = get_random_bytes(akey_size, self.get_akeys())
             dkey = get_random_bytes(dkey_size, self.get_dkeys())
             if data_array_size == 0:
-                print("---SAMIR- Writing-Single-Type--\n")
                 data = get_random_bytes(data_size)
             else:
                 data = [
@@ -132,7 +133,6 @@ class TestContainerData():
             # Verify the data was written correctly
             data_read = self.read_record(
                 container, akey, dkey, data_size, data_array_size)
-            print("Write Data = {}".format(data))
             if data != data_read:
                 raise DaosTestError(
                     "Written data confirmation failed:"
@@ -222,7 +222,8 @@ class TestContainerData():
                         ", punched={}) from".format(record_info["punched"])))
                 status = False
                 continue
-            print("Read Data = {}".format(actual))
+            #print(" -- SAMIR -- Read dkey = {} akey = {} Data = {}"
+            #      .format(record_info["dkey"], record_info["akey"], actual))
             expect = b"" if record_info["punched"] else record_info["data"]
             if actual != expect:
                 self.log.error(
@@ -232,7 +233,6 @@ class TestContainerData():
                     record_info["punched"], expect, actual)
                 status = False
         return status
-
 
 class TestContainer(TestDaosApiBase):
     """A class for functional testing of DaosContainer objects."""
@@ -618,6 +618,7 @@ class TestContainer(TestDaosApiBase):
             self.uuid, " on rank {}".format(rank) if rank is not None else "",
             " with object class {}".format(obj_class)
             if obj_class is not None else "")
+
         for _ in range(self.object_qty.value):
             self.written_data.append(TestContainerData(self.debug.value))
             self.written_data[-1].write_object(
