@@ -46,16 +46,14 @@ pool:
 container:
     type: POSIX
     control_method: API
-    object_qty: 1
-    record_size: 1
-    record_qty: 1
-    akey_size: 1
-    dkey_size: 1
-    data_size: 4194304
+    single_data_set:
+      # [object_qty, record_qty, akey, dkey, data_size]
+      - [1, 1, 1, 1, 4194304]
 objectclass:
-  dfs_oclass:
-    #- [EC_Object_Class, Minimum number of servers]
-    - ["EC_2P1G1", 4]
-    - ["EC_4P1G1", 6]
-    - ["EC_4P2G1", 6]
-    - ["EC_8P2G1", 10]
+    dfs_oclass:
+      #- [EC_Object_Class, Minimum number of servers]
+      - ["EC_2P1G1", 4]
+      - ["EC_2P2G1", 4]
+      #- ["EC_4P1G1", 6]
+      #- ["EC_4P2G1", 6]
+      #- ["EC_8P2G1", 10]

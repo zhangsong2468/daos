@@ -16,8 +16,11 @@ class EcDisabledRebuild(ErasureCodeIor):
                             single server when pool rebuild is off.
     :avocado: recursive
     """
+    def setUp(self):
+        super().setUp()
+        self.setup_ior()
 
-    @skipForTicket("DAOS-6660")
+    #@skipForTicket("DAOS-6660")
     def test_ec_degrade(self):
         """Jira ID: DAOS-5893.
 
