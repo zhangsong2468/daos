@@ -182,14 +182,23 @@ public enum PropType
   /**
    * <pre>
    * *
+   * Override the pool scrubbing property.
+   * </pre>
+   *
+   * <code>DAOS_PROP_CO_SCRUBBER_DISABLED = 4103;</code>
+   */
+  DAOS_PROP_CO_SCRUBBER_DISABLED(4103),
+  /**
+   * <pre>
+   * *
    * Redundancy factor:
    * RF(n): Container I/O restricted after n faults.
    * default = RF1 (DAOS_PROP_CO_REDUN_RF1)
    * </pre>
    *
-   * <code>DAOS_PROP_CO_REDUN_FAC = 4103;</code>
+   * <code>DAOS_PROP_CO_REDUN_FAC = 4104;</code>
    */
-  DAOS_PROP_CO_REDUN_FAC(4103),
+  DAOS_PROP_CO_REDUN_FAC(4104),
   /**
    * <pre>
    * *
@@ -197,18 +206,18 @@ public enum PropType
    * default = rack (DAOS_PROP_CO_REDUN_NODE)
    * </pre>
    *
-   * <code>DAOS_PROP_CO_REDUN_LVL = 4104;</code>
+   * <code>DAOS_PROP_CO_REDUN_LVL = 4105;</code>
    */
-  DAOS_PROP_CO_REDUN_LVL(4104),
+  DAOS_PROP_CO_REDUN_LVL(4105),
   /**
    * <pre>
    * *
    * Maximum number of snapshots to retain.
    * </pre>
    *
-   * <code>DAOS_PROP_CO_SNAPSHOT_MAX = 4105;</code>
+   * <code>DAOS_PROP_CO_SNAPSHOT_MAX = 4106;</code>
    */
-  DAOS_PROP_CO_SNAPSHOT_MAX(4105),
+  DAOS_PROP_CO_SNAPSHOT_MAX(4106),
   /**
    * <pre>
    * *
@@ -218,25 +227,25 @@ public enum PropType
    * Expected to be in the order: Owner, User(s), Group(s), Everyone
    * </pre>
    *
-   * <code>DAOS_PROP_CO_ACL = 4106;</code>
+   * <code>DAOS_PROP_CO_ACL = 4107;</code>
    */
-  DAOS_PROP_CO_ACL(4106),
+  DAOS_PROP_CO_ACL(4107),
   /**
    * <pre>
    * * Compression on/off + compression type
    * </pre>
    *
-   * <code>DAOS_PROP_CO_COMPRESS = 4107;</code>
+   * <code>DAOS_PROP_CO_COMPRESS = 4108;</code>
    */
-  DAOS_PROP_CO_COMPRESS(4107),
+  DAOS_PROP_CO_COMPRESS(4108),
   /**
    * <pre>
    * * Encryption on/off + encryption type
    * </pre>
    *
-   * <code>DAOS_PROP_CO_ENCRYPT = 4108;</code>
+   * <code>DAOS_PROP_CO_ENCRYPT = 4109;</code>
    */
-  DAOS_PROP_CO_ENCRYPT(4108),
+  DAOS_PROP_CO_ENCRYPT(4109),
   /**
    * <pre>
    * *
@@ -244,9 +253,9 @@ public enum PropType
    * Format: user&#64;[domain]
    * </pre>
    *
-   * <code>DAOS_PROP_CO_OWNER = 4109;</code>
+   * <code>DAOS_PROP_CO_OWNER = 4110;</code>
    */
-  DAOS_PROP_CO_OWNER(4109),
+  DAOS_PROP_CO_OWNER(4110),
   /**
    * <pre>
    * *
@@ -254,13 +263,13 @@ public enum PropType
    * Format: group&#64;[domain]
    * </pre>
    *
-   * <code>DAOS_PROP_CO_OWNER_GROUP = 4110;</code>
+   * <code>DAOS_PROP_CO_OWNER_GROUP = 4111;</code>
    */
-  DAOS_PROP_CO_OWNER_GROUP(4110),
+  DAOS_PROP_CO_OWNER_GROUP(4111),
   /**
-   * <code>DAOS_PROP_CO_MAX = 4111;</code>
+   * <code>DAOS_PROP_CO_MAX = 4112;</code>
    */
-  DAOS_PROP_CO_MAX(4111),
+  DAOS_PROP_CO_MAX(4112),
   UNRECOGNIZED(-1),
   ;
 
@@ -431,14 +440,23 @@ public enum PropType
   /**
    * <pre>
    * *
+   * Override the pool scrubbing property.
+   * </pre>
+   *
+   * <code>DAOS_PROP_CO_SCRUBBER_DISABLED = 4103;</code>
+   */
+  public static final int DAOS_PROP_CO_SCRUBBER_DISABLED_VALUE = 4103;
+  /**
+   * <pre>
+   * *
    * Redundancy factor:
    * RF(n): Container I/O restricted after n faults.
    * default = RF1 (DAOS_PROP_CO_REDUN_RF1)
    * </pre>
    *
-   * <code>DAOS_PROP_CO_REDUN_FAC = 4103;</code>
+   * <code>DAOS_PROP_CO_REDUN_FAC = 4104;</code>
    */
-  public static final int DAOS_PROP_CO_REDUN_FAC_VALUE = 4103;
+  public static final int DAOS_PROP_CO_REDUN_FAC_VALUE = 4104;
   /**
    * <pre>
    * *
@@ -446,18 +464,18 @@ public enum PropType
    * default = rack (DAOS_PROP_CO_REDUN_NODE)
    * </pre>
    *
-   * <code>DAOS_PROP_CO_REDUN_LVL = 4104;</code>
+   * <code>DAOS_PROP_CO_REDUN_LVL = 4105;</code>
    */
-  public static final int DAOS_PROP_CO_REDUN_LVL_VALUE = 4104;
+  public static final int DAOS_PROP_CO_REDUN_LVL_VALUE = 4105;
   /**
    * <pre>
    * *
    * Maximum number of snapshots to retain.
    * </pre>
    *
-   * <code>DAOS_PROP_CO_SNAPSHOT_MAX = 4105;</code>
+   * <code>DAOS_PROP_CO_SNAPSHOT_MAX = 4106;</code>
    */
-  public static final int DAOS_PROP_CO_SNAPSHOT_MAX_VALUE = 4105;
+  public static final int DAOS_PROP_CO_SNAPSHOT_MAX_VALUE = 4106;
   /**
    * <pre>
    * *
@@ -467,25 +485,25 @@ public enum PropType
    * Expected to be in the order: Owner, User(s), Group(s), Everyone
    * </pre>
    *
-   * <code>DAOS_PROP_CO_ACL = 4106;</code>
+   * <code>DAOS_PROP_CO_ACL = 4107;</code>
    */
-  public static final int DAOS_PROP_CO_ACL_VALUE = 4106;
+  public static final int DAOS_PROP_CO_ACL_VALUE = 4107;
   /**
    * <pre>
    * * Compression on/off + compression type
    * </pre>
    *
-   * <code>DAOS_PROP_CO_COMPRESS = 4107;</code>
+   * <code>DAOS_PROP_CO_COMPRESS = 4108;</code>
    */
-  public static final int DAOS_PROP_CO_COMPRESS_VALUE = 4107;
+  public static final int DAOS_PROP_CO_COMPRESS_VALUE = 4108;
   /**
    * <pre>
    * * Encryption on/off + encryption type
    * </pre>
    *
-   * <code>DAOS_PROP_CO_ENCRYPT = 4108;</code>
+   * <code>DAOS_PROP_CO_ENCRYPT = 4109;</code>
    */
-  public static final int DAOS_PROP_CO_ENCRYPT_VALUE = 4108;
+  public static final int DAOS_PROP_CO_ENCRYPT_VALUE = 4109;
   /**
    * <pre>
    * *
@@ -493,9 +511,9 @@ public enum PropType
    * Format: user&#64;[domain]
    * </pre>
    *
-   * <code>DAOS_PROP_CO_OWNER = 4109;</code>
+   * <code>DAOS_PROP_CO_OWNER = 4110;</code>
    */
-  public static final int DAOS_PROP_CO_OWNER_VALUE = 4109;
+  public static final int DAOS_PROP_CO_OWNER_VALUE = 4110;
   /**
    * <pre>
    * *
@@ -503,13 +521,13 @@ public enum PropType
    * Format: group&#64;[domain]
    * </pre>
    *
-   * <code>DAOS_PROP_CO_OWNER_GROUP = 4110;</code>
+   * <code>DAOS_PROP_CO_OWNER_GROUP = 4111;</code>
    */
-  public static final int DAOS_PROP_CO_OWNER_GROUP_VALUE = 4110;
+  public static final int DAOS_PROP_CO_OWNER_GROUP_VALUE = 4111;
   /**
-   * <code>DAOS_PROP_CO_MAX = 4111;</code>
+   * <code>DAOS_PROP_CO_MAX = 4112;</code>
    */
-  public static final int DAOS_PROP_CO_MAX_VALUE = 4111;
+  public static final int DAOS_PROP_CO_MAX_VALUE = 4112;
 
 
   public final int getNumber() {
@@ -571,22 +589,24 @@ public enum PropType
       case 4102:
         return DAOS_PROP_CO_CSUM_SERVER_VERIFY;
       case 4103:
-        return DAOS_PROP_CO_REDUN_FAC;
+        return DAOS_PROP_CO_SCRUBBER_DISABLED;
       case 4104:
-        return DAOS_PROP_CO_REDUN_LVL;
+        return DAOS_PROP_CO_REDUN_FAC;
       case 4105:
-        return DAOS_PROP_CO_SNAPSHOT_MAX;
+        return DAOS_PROP_CO_REDUN_LVL;
       case 4106:
-        return DAOS_PROP_CO_ACL;
+        return DAOS_PROP_CO_SNAPSHOT_MAX;
       case 4107:
-        return DAOS_PROP_CO_COMPRESS;
+        return DAOS_PROP_CO_ACL;
       case 4108:
-        return DAOS_PROP_CO_ENCRYPT;
+        return DAOS_PROP_CO_COMPRESS;
       case 4109:
-        return DAOS_PROP_CO_OWNER;
+        return DAOS_PROP_CO_ENCRYPT;
       case 4110:
-        return DAOS_PROP_CO_OWNER_GROUP;
+        return DAOS_PROP_CO_OWNER;
       case 4111:
+        return DAOS_PROP_CO_OWNER_GROUP;
+      case 4112:
         return DAOS_PROP_CO_MAX;
       default:
         return null;

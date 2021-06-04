@@ -562,9 +562,10 @@ public class DaosUns {
         case DAOS_PROP_PO_SPACE_RB:
         case DAOS_PROP_CO_LAYOUT_VER:
         case DAOS_PROP_CO_LAYOUT_TYPE:
+        case DAOS_PROP_CO_CSUM:
         case DAOS_PROP_CO_CSUM_CHUNK_SIZE:
         case DAOS_PROP_CO_CSUM_SERVER_VERIFY:
-        case DAOS_PROP_CO_CSUM:
+        case DAOS_PROP_CO_SCRUBBER_DISABLED:
         case DAOS_PROP_CO_REDUN_FAC:
         case DAOS_PROP_CO_REDUN_LVL:
         case DAOS_PROP_CO_SNAPSHOT_MAX:

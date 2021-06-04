@@ -125,6 +125,10 @@ enum daos_cont_props {
 	*/
 	DAOS_PROP_CO_CSUM_SERVER_VERIFY,
 	/**
+	 * Override the pool scrubbing property.
+	 */
+	DAOS_PROP_CO_SCRUBBER_DISABLED,
+	/**
 	 * Redundancy factor:
 	 * RF(n): Container I/O restricted after n faults.
 	 * default = RF0 (DAOS_PROP_CO_REDUN_RF0)

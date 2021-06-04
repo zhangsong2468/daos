@@ -1147,6 +1147,15 @@ cont_decode_props(daos_prop_t *props, daos_prop_t *prop_acl)
 			D_PRINT("<unknown value> ("DF_X64")\n", entry->dpe_val);
 	}
 
+	entry = daos_prop_entry_get(props, DAOS_PROP_CO_SCRUBBER_DISABLED);
+	if (entry == NULL) {
+		fprintf(stderr, "scrubber disabled property not found\n");
+		rc = -DER_INVAL;
+	} else {
+		D_PRINT("scrubber disabled: \t%s\n",
+			entry->dpe_val == true ? "Yes" : "No");
+	}
+
 	entry = daos_prop_entry_get(props, DAOS_PROP_CO_DEDUP);
 	if (entry == NULL) {
 		fprintf(stderr, "dedup property not found\n");

@@ -87,42 +87,46 @@ enum PropType {
   */
   DAOS_PROP_CO_CSUM_SERVER_VERIFY = 0x1006;
   /**
+   * Override the pool scrubbing property.
+   */
+  DAOS_PROP_CO_SCRUBBER_DISABLED = 0x1007,
+  /**
    * Redundancy factor:
    * RF(n): Container I/O restricted after n faults.
    * default = RF1 (DAOS_PROP_CO_REDUN_RF1)
    */
-  DAOS_PROP_CO_REDUN_FAC = 0x1007;
+  DAOS_PROP_CO_REDUN_FAC = 0x1008;
   /**
    * Redundancy level: default fault domain level for placement.
    * default = rack (DAOS_PROP_CO_REDUN_NODE)
    */
-  DAOS_PROP_CO_REDUN_LVL = 0x1008;
+  DAOS_PROP_CO_REDUN_LVL = 0x1009;
   /**
    * Maximum number of snapshots to retain.
    */
-  DAOS_PROP_CO_SNAPSHOT_MAX = 0x1009;
+  DAOS_PROP_CO_SNAPSHOT_MAX = 0x100A;
   /**
    * ACL: access control list for container
    * An ordered list of access control entries detailing user and group
    * access privileges.
    * Expected to be in the order: Owner, User(s), Group(s), Everyone
    */
-  DAOS_PROP_CO_ACL = 0x100A;
+  DAOS_PROP_CO_ACL = 0x100B;
   /** Compression on/off + compression type */
-  DAOS_PROP_CO_COMPRESS = 0x100B;
+  DAOS_PROP_CO_COMPRESS = 0x100C;
   /** Encryption on/off + encryption type */
-  DAOS_PROP_CO_ENCRYPT = 0x100C;
+  DAOS_PROP_CO_ENCRYPT = 0x100D;
   /**
    * The user who acts as the owner of the container.
    * Format: user@[domain]
    */
-  DAOS_PROP_CO_OWNER = 0x100D;
+  DAOS_PROP_CO_OWNER = 0x100E;
   /**
    * The group that acts as the owner of the container.
    * Format: group@[domain]
    */
-  DAOS_PROP_CO_OWNER_GROUP = 0x100E;
-  DAOS_PROP_CO_MAX = 0x100F;
+  DAOS_PROP_CO_OWNER_GROUP = 0x100F;
+  DAOS_PROP_CO_MAX = 0x1010;
 }
 
 enum Layout {
