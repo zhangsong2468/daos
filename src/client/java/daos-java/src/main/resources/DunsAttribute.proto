@@ -52,7 +52,26 @@ enum PropType {
    * The pool svc rank list.
    */
   DAOS_PROP_PO_SVC_LIST = 8;
-  DAOS_PROP_PO_MAX = 9;
+  /**
+   * Schedule that the checksum scrubber will run. See
+   * DAOS_SCRUBBER_SCHED_*
+   *
+   * default: DAOS_SCRUBBER_SCHED_OFF
+   */
+  DAOS_PROP_PO_SCRUBBER_SCHED = 9;
+  /**
+   * How frequently the schedule will run. In seconds.
+   *
+   * default: 604800 seconds (1 week)
+   */
+  DAOS_PROP_PO_SCRUBBER_FREQ = 10;
+  /**
+   * Number of credits consumed before scrubber will yield/sleep
+   *
+   * default: 1 (will yield after every credit consumed)
+   */
+  DAOS_PROP_PO_SCRUBBER_CREDITS = 11;
+  DAOS_PROP_PO_MAX = 12;
 
   /* container property types */
   DAOS_PROP_CO_MIN = 0x1000;

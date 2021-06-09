@@ -562,6 +562,18 @@ pool_properties(void **state)
 		assert_int_equal(rc, 1); /* fail the test */
 	}
 
+	/* [todo-ryon]: do this for the others */
+	entry = daos_prop_entry_get(prop_query, DAOS_PROP_PO_SCRUBBER_SCHED);
+	if (entry == NULL ||
+		(entry->dpe_val != DAOS_SCRUBBER_SCHED_OFF &&
+		    entry->dpe_val != DAOS_SCRUBBER_SCHED_RUN_WAIT &&
+		    entry->dpe_val != DAOS_SCRUBBER_SCHED_CONTINUOUS &&
+		    entry->dpe_val != DAOS_SCRUBBER_SCHED_RUN_ONCE &&
+		    entry->dpe_val != DAOS_SCRUBBER_SCHED_RUN_ONCE_NO_YIELD)) {
+		print_message("scrubber sched verification filed.\n");
+		assert_int_equal(rc, 1); /* fail the test */
+	}
+
 	if (arg->myrank == 0)
 		daos_debug_set_params(arg->group, -1, DMG_KEY_FAIL_LOC, 0,
 				     0, NULL);

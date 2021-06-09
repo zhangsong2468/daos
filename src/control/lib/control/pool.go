@@ -134,8 +134,11 @@ type (
 		NumRanks   uint32
 		// manual params
 		Ranks     []system.Rank
-		ScmBytes  uint64
-		NvmeBytes uint64
+		ScmBytes   uint64
+		NvmeBytes  uint64
+		ScrubSched uint64
+		ScrubFreq  uint64
+		ScrubCred  uint64
 	}
 
 	// PoolCreateResp contains the response from a pool create request.
@@ -358,6 +361,10 @@ type (
 		Records uint64           `json:"records"`
 	}
 
+	PoolScrubberInfo struct {
+		Schedule		uint32				`json:"sched"`
+	}
+
 	// PoolInfo contains information about the pool.
 	PoolInfo struct {
 		TotalTargets    uint32             `json:"total_targets"`
@@ -369,6 +376,7 @@ type (
 		Rebuild         *PoolRebuildStatus `json:"rebuild"`
 		Scm             *StorageUsageStats `json:"scm"`
 		Nvme            *StorageUsageStats `json:"nvme"`
+		Scrubber		*PoolScrubberInfo  `json:"scrubber"`
 	}
 
 	// PoolQueryResp contains the pool query response.

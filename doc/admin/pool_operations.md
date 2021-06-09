@@ -41,6 +41,9 @@ $ dmg pool create --help
       -n, --nvme-size= Per-server NVMe allocation for DAOS pool (manual)
       -r, --ranks=     Storage server unique identifiers (ranks) for DAOS pool
       -S, --sys=       DAOS system that pool is to be a part of (default: daos_server)
+      -d, --scrub      Checksum scrubbing schedule (Off, Wait, Cont, Once, NoYield)
+      -b, --scrub_freq Checksum scrubbing schedule frequency
+      -c, --scrub_cred Checksum scrubbing credits
 ```
 
 The typical output of this command is as follows:

@@ -16,6 +16,15 @@ extern "C" {
 
 #include <daos_types.h>
 
+/** Pool checksum scrubbing schedule type */
+enum {
+	DAOS_SCRUBBER_SCHED_OFF,
+	DAOS_SCRUBBER_SCHED_RUN_WAIT,
+	DAOS_SCRUBBER_SCHED_CONTINUOUS,
+	DAOS_SCRUBBER_SCHED_RUN_ONCE,
+	DAOS_SCRUBBER_SCHED_RUN_ONCE_NO_YIELD,
+};
+
 /**
  * DAOS pool property types
  * valid in range (DAOS_PROP_PO_MIN, DAOS_PROP_PO_MAX)
@@ -67,6 +76,26 @@ enum daos_pool_props {
 	 */
 	DAOS_PROP_PO_SVC_LIST,
 	DAOS_PROP_PO_EC_CELL_SZ,
+	/* [todo-ryon]: rename to scrub_cred */
+	/**
+	 * Schedule that the checksum scrubber will run. See
+	 * DAOS_SCRUBBER_SCHED_*
+	 *
+	 * default: DAOS_SCRUBBER_SCHED_OFF
+	 */
+	DAOS_PROP_PO_SCRUBBER_SCHED,
+	/**
+	 * How frequently the schedule will run. In seconds.
+	 *
+	 * default: 604800 seconds (1 week)
+	 */
+	DAOS_PROP_PO_SCRUBBER_FREQ,
+	/**
+	 * Number of credits consumed before scrubber will yield/sleep
+	 *
+	 * default: 1 (will yield after every credit consumed)
+	 */
+	DAOS_PROP_PO_SCRUBBER_CREDITS,
 	DAOS_PROP_PO_MAX,
 };
 

@@ -307,9 +307,24 @@ daos_prop_valid(daos_prop_t *prop, bool pool, bool input)
 				prop->dpp_entries[i].dpe_str))
 				return false;
 			break;
-		/* container-only properties */
 		case DAOS_PROP_PO_SVC_LIST:
 			break;
+		case DAOS_PROP_PO_SCRUBBER_SCHED:
+			val = prop->dpp_entries[i].dpe_val;
+			if (val != DAOS_SCRUBBER_SCHED_OFF &&
+			    val != DAOS_SCRUBBER_SCHED_RUN_WAIT &&
+			    val != DAOS_SCRUBBER_SCHED_CONTINUOUS &&
+			    val != DAOS_SCRUBBER_SCHED_RUN_ONCE &&
+			    val != DAOS_SCRUBBER_SCHED_RUN_ONCE_NO_YIELD)
+				return false;
+			break;
+		case DAOS_PROP_PO_SCRUBBER_FREQ:
+			/* accepting any number of seconds for now */
+			break;
+		case DAOS_PROP_PO_SCRUBBER_CREDITS:
+			/* accepting any number of credits for now */
+			break;
+		/* container-only properties */
 		case DAOS_PROP_CO_LAYOUT_TYPE:
 			val = prop->dpp_entries[i].dpe_val;
 			if (val != DAOS_PROP_CO_LAYOUT_UNKOWN &&
@@ -433,6 +448,8 @@ daos_prop_valid(daos_prop_t *prop, bool pool, bool input)
 		case DAOS_PROP_CO_ROOTS:
 		case DAOS_PROP_CO_EC_CELL_SZ:
 			break;
+
+
 		default:
 			D_ERROR("invalid dpe_type %d.\n", type);
 			return false;

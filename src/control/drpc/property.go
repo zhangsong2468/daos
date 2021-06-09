@@ -24,6 +24,9 @@ const (
 	PoolPropertyOwner = C.DAOS_PROP_PO_OWNER
 	// PoolPropertyOwnerGroup is the group that acts as the owner of the pool.
 	PoolPropertyOwnerGroup = C.DAOS_PROP_PO_OWNER_GROUP
+	PoolPropertyScrubSched = C.DAOS_PROP_PO_SCRUBBER_SCHED
+	PoolPropertyScrubFreq = C.DAOS_PROP_PO_SCRUBBER_FREQ
+	PoolPropertyScrubCred = C.DAOS_PROP_PO_SCRUBBER_CREDITS
 )
 
 const (

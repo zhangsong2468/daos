@@ -188,6 +188,48 @@ pool_decode_props(daos_prop_t *props)
 		daos_acl_dump(entry->dpe_val_ptr);
 	}
 
+	entry = daos_prop_entry_get(props, DAOS_PROP_PO_SCRUBBER_SCHED);
+	if (entry == NULL) {
+		fprintf(stderr, "scrubbing schedule property not found\n");
+		rc = -DER_INVAL;
+	} else {
+		D_PRINT("scrubbing schedule:\t\t");
+		switch (entry->dpe_val) {
+		case DAOS_SCRUBBER_SCHED_OFF:
+			D_PRINT("Off\n");
+			break;
+		case DAOS_SCRUBBER_SCHED_RUN_WAIT:
+			D_PRINT("Run-Wait\n");
+			break;
+		case DAOS_SCRUBBER_SCHED_CONTINUOUS:
+			D_PRINT("Continuous\n");
+			break;
+		case DAOS_SCRUBBER_SCHED_RUN_ONCE:
+			D_PRINT("Run-Once\n");
+			break;
+		case DAOS_SCRUBBER_SCHED_RUN_ONCE_NO_YIELD:
+			D_PRINT("Run-Once-No-Yield\n");
+			break;
+		default:
+			D_PRINT("UNKNOWN\n");
+		}
+	}
+
+	entry = daos_prop_entry_get(props, DAOS_PROP_PO_SCRUBBER_FREQ);
+	if (entry == NULL) {
+		fprintf(stderr, "scrubbing frequency property not found\n");
+		rc = -DER_INVAL;
+	} else {
+		D_PRINT("scrubbing frequency: %lu\t\t\n", entry->dpe_val);
+	}
+
+	entry = daos_prop_entry_get(props, DAOS_PROP_PO_SCRUBBER_CREDITS);
+	if (entry == NULL) {
+		fprintf(stderr, "scrubbing credits property not found\n");
+		rc = -DER_INVAL;
+	} else {
+		D_PRINT("scrubbing credits: %lu\t\t", entry->dpe_val);
+	}
 	return rc;
 }
 

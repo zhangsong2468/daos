@@ -52,6 +52,11 @@ func PrintPoolQueryResponse(pqr *control.PoolQueryResp, out io.Writer, opts ...P
 			fmt.Fprintf(w, "Rebuild failed, rc=%d, status=%d\n", pqr.Status, pqr.Rebuild.Status)
 		}
 	}
+	if pqr.Scrubber != nil {
+		fmt.Fprintf(w, "Scrubber: sched=%d\n", pqr.Scrubber.Schedule)
+	} else {
+		fmt.Fprintf(w, "No Scrubber!!\n")
+	}
 
 	return w.Err
 }

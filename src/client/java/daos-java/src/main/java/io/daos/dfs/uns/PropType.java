@@ -108,9 +108,42 @@ public enum PropType
    */
   DAOS_PROP_PO_SVC_LIST(8),
   /**
+   * <pre>
+   * *
+   * Schedule that the checksum scrubber will run. See
+   * DAOS_SCRUBBER_SCHED_*
+   *
+   * default: DAOS_SCRUBBER_SCHED_OFF
+   * </pre>
+   * <code>DAOS_PROP_PO_SCRUBBER_SCHED = 9;</code>
+   */
+  DAOS_PROP_PO_SCRUBBER_SCHED(9),
+  /**
+   * <pre>
+   * *
+   * How frequently the schedule will run. In seconds.
+   *
+   * default: 604800 seconds (1 week)
+   * </pre>
+   *
+   * <code>DAOS_PROP_PO_SCRUBBER_FREQ=10;</code>
+   */
+  DAOS_PROP_PO_SCRUBBER_FREQ(10),
+  /**
+   * <pre>
+   * *
+   * Number of credits consumed before scrubber will yield/sleep
+   *
+   * default: 1 (will yield after every credit consumed)
+   * </pre>
+   *
+   * <code>DAOS_PROP_PO_SCRUBBER_CREDITS = 11;</code>
+   */
+  DAOS_PROP_PO_SCRUBBER_CREDITS(11),
+  /**
    * <code>DAOS_PROP_PO_MAX = 9;</code>
    */
-  DAOS_PROP_PO_MAX(9),
+  DAOS_PROP_PO_MAX(12),
   /**
    * <pre>
    * container property types
@@ -366,9 +399,42 @@ public enum PropType
    */
   public static final int DAOS_PROP_PO_SVC_LIST_VALUE = 8;
   /**
-   * <code>DAOS_PROP_PO_MAX = 9;</code>
+     * <pre>
+     * *
+     * Schedule that the checksum scrubber will run. See
+     * DAOS_SCRUBBER_SCHED_*
+     *
+     * default: DAOS_SCRUBBER_SCHED_OFF
+     * </pre>
+     * <code>DAOS_PROP_PO_SCRUBBER_SCHED = 9;</code>
+     */
+    public static final int DAOS_PROP_PO_SCRUBBER_SCHED_VALUE = 9;
+    /**
+     * <pre>
+     * *
+     * How frequently the schedule will run. In seconds.
+     *
+     * default: 604800 seconds (1 week)
+     * </pre>
+     *
+     * <code>DAOS_PROP_PO_SCRUBBER_FREQ=10;</code>
+     */
+    public static final int DAOS_PROP_PO_SCRUBBER_FREQ_VALUE = 10;
+    /**
+     * <pre>
+     * *
+     * Number of credits consumed before scrubber will yield/sleep
+     *
+     * default: 1 (will yield after every credit consumed)
+     * </pre>
+     *
+     * <code>DAOS_PROP_PO_SCRUBBER_CREDITS = 11;</code>
+     */
+    public static final int DAOS_PROP_PO_SCRUBBER_CREDITS_VALUE = 11;
+  /**
+   * <code>DAOS_PROP_PO_MAX = 12;</code>
    */
-  public static final int DAOS_PROP_PO_MAX_VALUE = 9;
+  public static final int DAOS_PROP_PO_MAX_VALUE = 12;
   /**
    * <pre>
    * container property types

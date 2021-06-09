@@ -569,6 +569,9 @@ public class DaosUns {
         case DAOS_PROP_CO_REDUN_FAC:
         case DAOS_PROP_CO_REDUN_LVL:
         case DAOS_PROP_CO_SNAPSHOT_MAX:
+        case DAOS_PROP_PO_SCRUBBER_SCHED:
+        case DAOS_PROP_PO_SCRUBBER_FREQ:
+        case DAOS_PROP_PO_SCRUBBER_CREDITS:
           return Long.class;
         case DAOS_PROP_PO_LABEL:
         case DAOS_PROP_PO_SELF_HEAL:

@@ -1367,6 +1367,7 @@ ds_mgmt_drpc_pool_query(Drpc__Call *drpc_req, Drpc__Response *drpc_resp)
 	Mgmt__StorageUsageStats	scm = MGMT__STORAGE_USAGE_STATS__INIT;
 	Mgmt__StorageUsageStats	nvme = MGMT__STORAGE_USAGE_STATS__INIT;
 	Mgmt__PoolRebuildStatus	rebuild = MGMT__POOL_REBUILD_STATUS__INIT;
+	Mgmt__PoolScrubberInfo	scrubber = MGMT__POOL_SCRUBBER_INFO__INIT;
 	uuid_t			uuid;
 	daos_pool_info_t	pool_info = {0};
 	d_rank_list_t		*svc_ranks;
@@ -1418,6 +1419,9 @@ ds_mgmt_drpc_pool_query(Drpc__Call *drpc_req, Drpc__Response *drpc_resp)
 
 	pool_rebuild_status_from_info(&rebuild, &pool_info.pi_rebuild_st);
 	resp.rebuild = &rebuild;
+
+	scrubber.schedule = 49;
+	resp.scrubber = &scrubber;
 
 out_ranks:
 	d_rank_list_free(svc_ranks);

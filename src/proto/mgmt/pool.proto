@@ -33,6 +33,9 @@ message PoolCreateReq {
 	repeated uint32 ranks = 12; // target ranks (manual config)
 	uint64 scmbytes = 13; // SCM size in bytes (manual config)
 	uint64 nvmebytes = 14; // NVMe size in bytes (manual config)
+	uint64 scrubsched = 15; // checksum scrubbing schedule (manual config)
+	uint64 scrubfreq = 16; // checksum scrubbing frequency (manual config)
+	uint64 scrubcred = 17; // checksum scrubbing credits (manual config)
 }
 
 // PoolCreateResp returns created pool uuid and ranks.
@@ -204,6 +207,10 @@ message PoolRebuildStatus {
 	uint64 records = 4;
 }
 
+message PoolScrubberInfo {
+	uint32 schedule = 1;
+}
+
 // PoolQueryResp represents a pool query response.
 message PoolQueryResp {
 	int32 status = 1; // DAOS error code
@@ -218,6 +225,7 @@ message PoolQueryResp {
 	uint32 total_nodes = 10; // total nodes in pool
 	uint32 version = 11; // latest pool map version
 	uint32 leader = 12; // current raft leader
+	PoolScrubberInfo scrubber = 13;
 }
 
 // PoolSetPropReq represents a request to set a pool property.
