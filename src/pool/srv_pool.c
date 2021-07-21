@@ -972,6 +972,11 @@ ds_pool_crt_event_cb(d_rank_t rank, enum crt_event_source src,
 		return;
 	}
 
+	if (rank == dss_self_rank() && src == CRT_EVS_GRPMOD && type == CRT_EVT_DEAD) {
+		D_DEBUG(DB_MGMT, "ignore exclusion of self\n");
+		return;
+	}
+
 	rc = ds_pool_iv_prop_fetch(svc->ps_pool, &prop);
 	if (rc)
 		D_GOTO(out, rc);

@@ -473,6 +473,21 @@ dss_crt_event_cb(d_rank_t rank, enum crt_event_source src,
 	int			 rc = 0;
 	struct engine_metrics	*metrics;
 
+	if (rank == dss_self_rank() && src == CRT_EVS_GRPMOD && type == CRT_EVT_DEAD) {
+		D_ALERT("exclusion of this engine detected\n");
+#if 0 /* disabled for potential MS issue (?) */
+		/*
+		 * For now, we just raise a SIGTERM to ourselves; we could
+		 * inform daos_server, who would initiate a termination and
+		 * decide whether to restart us.
+		 */
+		rc = kill(getpid(), SIGTERM);
+		if (rc != 0)
+			D_ERROR("failed to raise SIGTERM: %d\n", errno);
+#endif
+		return;
+	}
+
 	/* We only care about dead ranks for now */
 	if (src != CRT_EVS_SWIM || type != CRT_EVT_DEAD) {
 		D_DEBUG(DB_MGMT, "ignore src/type/evict %u/%u\n",

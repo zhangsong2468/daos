@@ -2196,6 +2196,27 @@ out_unlock:
 	return rc;
 }
 
+void
+crt_trigger_event_cb(d_rank_t rank, enum crt_event_source src,
+		    enum crt_event_type type)
+{
+	struct crt_event_cb_priv	*cbs_event;
+	size_t				 cbs_size;
+	int				 cb_idx;
+	crt_event_cb			 cb_func;
+	void				*cb_args;
+
+	cbs_event = crt_plugin_gdata.cpg_event_cbs;
+	cbs_size = crt_plugin_gdata.cpg_event_size;
+	for (cb_idx = 0; cb_idx < cbs_size; cb_idx++) {
+		cb_func = cbs_event[cb_idx].cecp_func;
+		cb_args = cbs_event[cb_idx].cecp_args;
+
+		if (cb_func != NULL)
+			cb_func(rank, src, type, cb_args);
+	}
+}
+
 int
 crt_grp_psr_reload(struct crt_grp_priv *grp_priv)
 {
@@ -3259,12 +3280,8 @@ crt_group_primary_modify(crt_group_t *grp, crt_context_t *ctxs, int num_ctxs,
 	d_rank_list_t			*to_add;
 	uint32_t			*uri_idx;
 	d_rank_t			rank;
-	int				i, k, cb_idx;
+	int				i, k;
 	int				rc = 0;
-	crt_event_cb			cb_func;
-	void				*cb_args;
-	struct crt_event_cb_priv	*cbs_event;
-	size_t				cbs_size;
 
 	grp_priv = crt_grp_pub2priv(grp);
 
@@ -3303,9 +3320,6 @@ crt_group_primary_modify(crt_group_t *grp, crt_context_t *ctxs, int num_ctxs,
 	if (rc != 0)
 		D_GOTO(unlock, rc);
 
-	cbs_size = crt_plugin_gdata.cpg_event_size;
-	cbs_event = crt_plugin_gdata.cpg_event_cbs;
-
 	/* Add ranks based on to_add list */
 	for (i = 0; i < to_add->rl_nr; i++) {
 		rank = to_add->rl_ranks[i];
@@ -3328,14 +3342,7 @@ crt_group_primary_modify(crt_group_t *grp, crt_context_t *ctxs, int num_ctxs,
 		}
 
 		/* Notify about members being added */
-		for (cb_idx = 0; cb_idx < cbs_size; cb_idx++) {
-			cb_func = cbs_event[cb_idx].cecp_func;
-			cb_args = cbs_event[cb_idx].cecp_args;
-
-			if (cb_func != NULL)
-				cb_func(rank, CRT_EVS_GRPMOD, CRT_EVT_ALIVE,
-					cb_args);
-		}
+		crt_trigger_event_cb(rank, CRT_EVS_GRPMOD, CRT_EVT_ALIVE);
 	}
 
 	/* Remove ranks based on to_remove list */
@@ -3349,14 +3356,7 @@ crt_group_primary_modify(crt_group_t *grp, crt_context_t *ctxs, int num_ctxs,
 		}
 
 		/* Notify about members being removed */
-		for (cb_idx = 0; cb_idx < cbs_size; cb_idx++) {
-			cb_func = cbs_event[cb_idx].cecp_func;
-			cb_args = cbs_event[cb_idx].cecp_args;
-
-			if (cb_func != NULL)
-				cb_func(rank, CRT_EVS_GRPMOD, CRT_EVT_DEAD,
-					cb_args);
-		}
+		crt_trigger_event_cb(rank, CRT_EVS_GRPMOD, CRT_EVT_DEAD);
 
 		/* Remove rank from swim tracking */
 		crt_swim_rank_del(grp_priv, rank);

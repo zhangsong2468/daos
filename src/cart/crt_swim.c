@@ -33,7 +33,7 @@
 
 #define CRT_OSEQ_RPC_SWIM	/* output fields */		 \
 	((int32_t)		     (rc)		CRT_VAR) \
-	((int32_t)		     (pad)		CRT_VAR) \
+	((uint32_t)		     (grp_ver)		CRT_VAR) \
 	((struct swim_member_update) (upds)		CRT_ARRAY)
 
 static inline int
@@ -161,6 +161,23 @@ crt_swim_update_delays(struct crt_swim_membs *csm, uint64_t hlc,
 	return snd_delay;
 }
 
+/* Does "id" belong to the primary group? Answer using gp_lookup_cache. */
+static bool
+crt_swim_lookup_id(swim_id_t id, uint32_t *grp_ver)
+{
+	struct crt_grp_priv	*grp_priv = crt_gdata.cg_grp->gg_primary_grp;
+	d_rank_list_t		*membs;
+	bool			 exist = false;
+
+	D_RWLOCK_RDLOCK(&grp_priv->gp_rwlock);
+	membs = grp_priv_get_membs(grp_priv);
+	if (membs)
+		exist = d_rank_in_rank_list(membs, id);
+	*grp_ver = grp_priv->gp_membs_ver;
+	D_RWLOCK_UNLOCK(&grp_priv->gp_rwlock);
+	return exist;
+}
+
 static void crt_swim_srv_cb(crt_rpc_t *rpc)
 {
 	struct crt_rpc_priv	*rpc_priv = NULL;
@@ -177,6 +194,7 @@ static void crt_swim_srv_cb(crt_rpc_t *rpc)
 	uint64_t		 hlc = crt_hlc_get();
 	uint32_t		 rcv_delay = 0;
 	uint32_t		 snd_delay = 0;
+	bool			 exist;
 	int			 rc;
 
 	D_ASSERT(crt_is_service());
@@ -242,13 +260,13 @@ static void crt_swim_srv_cb(crt_rpc_t *rpc)
 
 		switch (rpc_type) {
 		case SWIM_RPC_PING:
-			rc = swim_updates_prepare(ctx, from_id, from_id,
+			rc = swim_updates_prepare(ctx, to_id, from_id,
 						  &rpc_out->upds.ca_arrays,
 						  &rpc_out->upds.ca_count);
 			break;
 		case SWIM_RPC_IREQ:
 			rc = swim_ipings_suspend(ctx, from_id, rpc_in->swim_id,
-						rpc);
+						 rpc);
 			if (rc == 0 || rc == -DER_ALREADY) {
 				D_TRACE_DEBUG(DB_TRACE, rpc,
 					      "suspend %s reply. "
@@ -279,6 +297,10 @@ static void crt_swim_srv_cb(crt_rpc_t *rpc)
 	crt_swim_accommodate();
 
 out_reply:
+	exist = crt_swim_lookup_id(from_id, &rpc_out->grp_ver);
+	if (!exist && !rc)
+		rc = -DER_CLI_EXCLUDED;
+
 	D_TRACE_DEBUG(DB_TRACE, rpc,
 		      "reply %s with %zu updates. %lu: %lu <= %lu "DF_RC"\n",
 		      SWIM_RPC_TYPE_STR[rpc_type], rpc_out->upds.ca_count,
@@ -286,8 +308,7 @@ out_reply:
 		      (rpc_type == SWIM_RPC_PING) ? to_id : rpc_in->swim_id,
 		      from_id, DP_RC(rc));
 
-	rpc_out->rc  = rc;
-	rpc_out->pad = 0;
+	rpc_out->rc = rc;
 	rc = crt_reply_send(rpc);
 	if (rc)
 		D_TRACE_ERROR(rpc, "send reply: "DF_RC" failed: "DF_RC"\n",
@@ -382,6 +403,16 @@ static void crt_swim_cli_cb(const struct crt_cb_info *cb_info)
 	if (rc)
 		D_TRACE_ERROR(rpc, "send reply: "DF_RC" failed: "DF_RC"\n",
 			      DP_RC(rpc_out->rc), DP_RC(rc));
+
+	D_RWLOCK_RDLOCK(&grp_priv->gp_rwlock);
+	if (rpc_out->rc == -DER_CLI_EXCLUDED &&
+	    rpc_out->grp_ver > grp_priv->gp_membs_ver) {
+		/* I'm excluded... */
+		D_WARN("excluded in group version %u (self %u)\n",
+		       rpc_out->grp_ver, grp_priv->gp_membs_ver);
+		crt_trigger_event_cb(from_id, CRT_EVS_GRPMOD, CRT_EVT_DEAD);
+	}
+	D_RWLOCK_UNLOCK(&grp_priv->gp_rwlock);
 
 out:
 	if (crt_swim_fail_delay && crt_swim_fail_id == self_id) {
@@ -486,6 +517,7 @@ static int crt_swim_send_reply(struct swim_context *ctx, swim_id_t from,
 	struct crt_rpc_priv	*rpc_priv;
 	struct crt_rpc_swim_out	*rpc_out;
 	swim_id_t		 self_id = swim_self_get(ctx);
+	bool			 exist;
 	int			 rc;
 
 	rpc_out = crt_reply_get(rpc);
@@ -494,8 +526,12 @@ static int crt_swim_send_reply(struct swim_context *ctx, swim_id_t from,
 	rc = swim_updates_prepare(ctx, from, to,
 				  &rpc_out->upds.ca_arrays,
 				  &rpc_out->upds.ca_count);
-	rpc_out->rc = rc ? rc : ret_rc;
-	rpc_out->pad = 0;
+	if (!rc)
+		rc = ret_rc;
+	exist = crt_swim_lookup_id(to, &rpc_out->grp_ver);
+	if (!exist && !rc)
+		rc = -DER_CLI_EXCLUDED;
+	rpc_out->rc = rc;
 
 	D_TRACE_DEBUG(DB_TRACE, rpc,
 		      "complete %s with %zu updates. "
@@ -592,11 +628,7 @@ out_unlock:
 static void
 crt_swim_notify_rank_state(d_rank_t rank, struct swim_member_state *state)
 {
-	struct crt_event_cb_priv *cbs_event;
-	crt_event_cb		 cb_func;
-	void			*cb_args;
 	enum crt_event_type	 cb_type;
-	size_t			 i, cbs_size;
 
 	D_ASSERT(state != NULL);
 	switch (state->sms_status) {
@@ -610,17 +642,7 @@ crt_swim_notify_rank_state(d_rank_t rank, struct swim_member_state *state)
 		return;
 	}
 
-	/* walk the global list to execute the user callbacks */
-	cbs_size = crt_plugin_gdata.cpg_event_size;
-	cbs_event = crt_plugin_gdata.cpg_event_cbs;
-
-	for (i = 0; i < cbs_size; i++) {
-		cb_func = cbs_event[i].cecp_func;
-		cb_args = cbs_event[i].cecp_args;
-		/* check for and execute event callbacks here */
-		if (cb_func != NULL)
-			cb_func(rank, CRT_EVS_SWIM, cb_type, cb_args);
-	}
+	crt_trigger_event_cb(rank, CRT_EVS_SWIM, cb_type);
 }
 
 static int crt_swim_get_member_state(struct swim_context *ctx,

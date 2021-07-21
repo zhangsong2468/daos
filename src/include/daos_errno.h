@@ -157,7 +157,10 @@ extern "C" {
 	/** Invalid user/group permissions.*/				\
 	ACTION(DER_SHMEM_PERMS,         (DER_ERR_GURT_BASE + 44),	\
 	       Unable to access shared memory segment due to		\
-	       incompatible user or group permissions)
+	       incompatible user or group permissions)			\
+	/** RPC client excluded */					\
+	ACTION(DER_CLI_EXCLUDED,	(DER_ERR_GURT_BASE + 45),	\
+	       RPC client excluded)
 	/** TODO: add more error numbers */
 
 #define D_FOREACH_DAOS_ERR(ACTION)					\

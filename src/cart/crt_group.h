@@ -63,7 +63,7 @@ struct crt_grp_priv {
 	 */
 	struct crt_grp_membs	gp_membs;
 	/*
-	 * the version number of the group. Set my crt_group_version_set or
+	 * the version number of the group. Set by crt_group_version_set or
 	 * crt_group_mod APIs.
 	 */
 	uint32_t		 gp_membs_ver;

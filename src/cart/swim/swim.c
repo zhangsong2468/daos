@@ -165,13 +165,13 @@ swim_updates_prepare(struct swim_context *ctx, swim_id_t id, swim_id_t to,
 	}
 
 	if (id != to) {
+		/* if can't get the state of "to", just proceed */
 		rc = ctx->sc_ops->get_member_state(ctx, to, &upds[n].smu_state);
-		if (rc) {
-			SWIM_ERROR("get_member_state(%lu): "DF_RC"\n", to,
-				   DP_RC(rc));
-			D_GOTO(out_unlock, rc);
-		}
-		upds[n++].smu_id = to;
+		if (rc)
+			SWIM_INFO("get_member_state(%lu): "DF_RC"\n", to,
+				  DP_RC(rc));
+		else
+			upds[n++].smu_id = to;
 	}
 
 	item = TAILQ_FIRST(&ctx->sc_updates);
