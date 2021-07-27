@@ -1615,14 +1615,19 @@ sched_watchdog_post(struct dss_xstream *dx, struct sched_unit *su)
 		return;
 
 	cur = daos_getmtime_coarse();
-	D_ASSERT(cur >= su->su_start);
-	elapsed = cur - su->su_start;
+	if (cur < su->su_start)
+		elapsed = sched_unit_runtime_max + 1;
+	else
+		elapsed = cur - su->su_start;
 
 	if (elapsed <= sched_unit_runtime_max)
 		return;
 
 	/* Throttle printing a bit */
-	D_ASSERT(cur >= info->si_stats.ss_watchdog_ts);
+	D_ASSERTF(cur >= info->si_stats.ss_watchdog_ts,
+		  "cur:"DF_U64" < watchdog_ts:"DF_U64"\n",
+		  cur, info->si_stats.ss_watchdog_ts);
+
 	if (info->si_stats.ss_last_unit == su->su_func_addr &&
 	    (cur - info->si_stats.ss_watchdog_ts) <= 2000)
 		return;
@@ -1636,6 +1641,8 @@ sched_watchdog_post(struct dss_xstream *dx, struct sched_unit *su)
 		strings != NULL ? strings[0] : NULL);
 
 	free(strings);
+	D_ASSERTF(cur >= su->su_start, "cur:"DF_U64" < start:"DF_U64"\n",
+		  cur, su->su_start);
 }
 
 static void
