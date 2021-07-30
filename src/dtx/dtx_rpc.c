@@ -593,6 +593,59 @@ dtx_dti_classify(struct ds_pool *pool, daos_handle_t tree,
 	return rc < 0 ? rc : length;
 }
 
+struct dtx_commit_args {
+	struct ds_cont_child	 *dca_cont;
+	daos_handle_t		 *dca_tree_hdl;
+	d_list_t		 *dca_head;
+	struct dtx_req_args	 *dca_dra;
+	int			  dca_count;
+	struct dtx_entry	**dca_dtes;
+	struct dtx_id		**dca_dtis;
+};
+
+static int
+dtx_commit_internal(struct ds_cont_child *cont, daos_handle_t *tree_hdl,
+		    d_list_t *head, struct dtx_entry **dtes, int count,
+		    struct dtx_req_args *dra, struct dtx_id **dtis)
+{
+	struct ds_pool		*pool = cont->sc_pool->spc_pool;
+	struct btr_root		 tree_root = { 0 };
+	struct umem_attr	 uma;
+	int			 length;
+	int			 rc;
+
+	memset(&uma, 0, sizeof(uma));
+	uma.uma_id = UMEM_CLASS_VMEM;
+	rc = dbtree_create_inplace(DBTREE_CLASS_DTX_CF, 0, DTX_CF_BTREE_ORDER,
+				   &uma, &tree_root, tree_hdl);
+	if (rc != 0)
+		goto out;
+
+	length = dtx_dti_classify(pool, *tree_hdl, dtes, count, head, dtis);
+	if (length < 0)
+		D_GOTO(out, rc = length);
+
+	if (!d_list_empty(head))
+		rc = dtx_req_list_send(dra, DTX_COMMIT, head, length,
+				       pool->sp_uuid, cont->sc_uuid, 0,
+				       NULL, NULL, NULL, NULL);
+
+out:
+	return rc;
+}
+
+static void
+dtx_commit_helper(void *arg)
+{
+	struct dtx_commit_args	*dca = arg;
+
+	dtx_commit_internal(dca->dca_cont, dca->dca_tree_hdl, dca->dca_head,
+			    dca->dca_dtes, dca->dca_count, dca->dca_dra,
+			    dca->dca_dtis);
+
+	D_FREE(dca);
+}
+
 /**
  * Commit the given DTX array globally.
  *
@@ -609,18 +662,15 @@ dtx_dti_classify(struct ds_pool *pool, daos_handle_t tree,
  */
 int
 dtx_commit(struct ds_cont_child *cont, struct dtx_entry **dtes,
-	   struct dtx_cos_key *dcks, int count)
+	   struct dtx_cos_key *dcks, int count, bool helper)
 {
 	struct dtx_req_args	 dra;
 	struct dtx_req_rec	*drr;
-	struct ds_pool		*pool = cont->sc_pool->spc_pool;
 	struct dtx_id		*dti = NULL;
 	bool			*rm_cos = NULL;
-	struct umem_attr	 uma;
-	struct btr_root		 tree_root = { 0 };
 	daos_handle_t		 tree_hdl = DAOS_HDL_INVAL;
+	struct dtx_commit_args	*cmt_arg = NULL;
 	d_list_t		 head;
-	int			 length;
 	int			 rc;
 	int			 rc1 = 0;
 	int			 rc2 = 0;
@@ -628,23 +678,33 @@ dtx_commit(struct ds_cont_child *cont, struct dtx_entry **dtes,
 	int			 cur = 0;
 	int			 i;
 
-	D_INIT_LIST_HEAD(&head);
-	memset(&uma, 0, sizeof(uma));
-	uma.uma_id = UMEM_CLASS_VMEM;
-	rc = dbtree_create_inplace(DBTREE_CLASS_DTX_CF, 0, DTX_CF_BTREE_ORDER,
-				   &uma, &tree_root, &tree_hdl);
-	if (rc != 0)
-		goto out;
-
-	length = dtx_dti_classify(pool, tree_hdl, dtes, count, &head, &dti);
-	if (length < 0)
-		D_GOTO(out, rc = length);
-
 	dra.dra_future = ABT_FUTURE_NULL;
-	if (!d_list_empty(&head)) {
-		rc = dtx_req_list_send(&dra, DTX_COMMIT, &head, length,
-				       pool->sp_uuid, cont->sc_uuid, 0,
-				       NULL, NULL, NULL, NULL);
+	D_INIT_LIST_HEAD(&head);
+
+	if (helper && count > 1) {
+		D_ALLOC_PTR(cmt_arg);
+		if (cmt_arg == NULL)
+			D_GOTO(out, rc = -DER_NOMEM);
+
+		cmt_arg->dca_cont = cont;
+		cmt_arg->dca_tree_hdl = &tree_hdl;
+		cmt_arg->dca_head = &head;
+		cmt_arg->dca_dra = &dra;
+		cmt_arg->dca_count = count;
+		cmt_arg->dca_dtes = dtes;
+		cmt_arg->dca_dtis = &dti;
+
+		rc = dss_ult_create(dtx_commit_helper, cmt_arg, DSS_XS_IOFW,
+				    dss_get_module_info()->dmi_tgt_id,
+				    DSS_DEEP_STACK_SZ, NULL);
+		if (rc != 0) {
+			D_FREE(cmt_arg);
+
+			goto out;
+		}
+	} else {
+		rc = dtx_commit_internal(cont, &tree_hdl, &head, dtes, count,
+					 &dra, &dti);
 		if (rc != 0)
 			goto out;
 	}
@@ -1045,7 +1105,7 @@ next:
 
 			dck.oid = dsp->dsp_oid;
 			dck.dkey_hash = dsp->dsp_dkey_hash;
-			rc = dtx_commit(cont, &pdte, &dck, 1);
+			rc = dtx_commit(cont, &pdte, &dck, 1, false);
 			if (rc < 0 && rc != -DER_NONEXIST && cmt_list != NULL)
 				d_list_add_tail(&dsp->dsp_link, cmt_list);
 			else
