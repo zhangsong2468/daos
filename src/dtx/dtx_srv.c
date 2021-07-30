@@ -79,6 +79,22 @@ dtx_metrics_alloc(const char *path, int tgt_id)
 	if (metrics == NULL)
 		return NULL;
 
+	rc = d_tm_add_metric(&metrics->dpm_batched_average, D_TM_COUNTER,
+			     "average DTX entries via batched commit RPC",
+			     "entries", "%s/entries/dtx_batched_average/tgt_%u",
+			     path, tgt_id);
+	if (rc != DER_SUCCESS)
+		D_WARN("Failed to create DTX batched average metric: "DF_RC"\n",
+		       DP_RC(rc));
+
+	rc = d_tm_add_metric(&metrics->dpm_batched_total, D_TM_COUNTER,
+			     "total DTX entries via batched commit RPC",
+			     "entries", "%s/entries/dtx_batched_total/tgt_%u",
+			     path, tgt_id);
+	if (rc != DER_SUCCESS)
+		D_WARN("Failed to create DTX batched total metric: "DF_RC"\n",
+		       DP_RC(rc));
+
 	/** Register different per-opcode counters */
 	for (opc = 0; opc < DTX_PROTO_SRV_RPC_COUNT; opc++) {
 		rc = d_tm_add_metric(&metrics->dpm_total[opc], D_TM_COUNTER,
@@ -108,7 +124,7 @@ struct dss_module_metrics dtx_metrics = {
 static void
 dtx_handler(crt_rpc_t *rpc)
 {
-	struct dtx_pool_metrics	*dpm;
+	struct dtx_pool_metrics	*dpm = NULL;
 	struct dtx_in		*din = crt_req_get(rpc);
 	struct dtx_out		*dout = crt_reply_get(rpc);
 	struct ds_cont_child	*cont = NULL;
@@ -132,8 +148,13 @@ dtx_handler(crt_rpc_t *rpc)
 		goto out;
 	}
 
+	dpm = cont->sc_pool->spc_metrics[DAOS_DTX_MODULE];
+
 	switch (opc) {
-	case DTX_COMMIT:
+	case DTX_COMMIT: {
+		uint64_t	opc_cnt = 0;
+		uint64_t	ent_cnt = 0;
+
 		if (DAOS_FAIL_CHECK(DAOS_DTX_MISS_COMMIT))
 			break;
 
@@ -148,7 +169,16 @@ dtx_handler(crt_rpc_t *rpc)
 
 			i += count;
 		}
+
+		d_tm_inc_counter(dpm->dpm_batched_total,
+				 din->di_dtx_array.ca_count);
+		d_tm_get_counter_srv(dpm->dpm_batched_total, &ent_cnt);
+		d_tm_get_counter_srv(dpm->dpm_total[opc], &opc_cnt);
+		d_tm_set_counter(dpm->dpm_batched_average,
+				 ent_cnt / (opc_cnt + 1));
+
 		break;
+	}
 	case DTX_ABORT:
 		if (DAOS_FAIL_CHECK(DAOS_DTX_MISS_ABORT))
 			break;
@@ -235,10 +265,8 @@ out:
 		D_ERROR("send reply failed for DTX rpc %u: rc = "DF_RC"\n", opc,
 			DP_RC(rc));
 
-	if (likely(cont != NULL)) {
-		dpm = cont->sc_pool->spc_metrics[DAOS_DTX_MODULE];
+	if (likely(dpm != NULL))
 		d_tm_inc_counter(dpm->dpm_total[opc], 1);
-	}
 
 	if (opc == DTX_REFRESH && rc1 > 0) {
 		struct dtx_entry	 dtes[DTX_REFRESH_MAX] = { 0 };
