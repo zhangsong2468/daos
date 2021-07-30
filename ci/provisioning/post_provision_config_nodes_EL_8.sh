@@ -94,7 +94,23 @@ post_provision_config_nodes() {
 
     # shellcheck disable=SC2086
     if [ -n "$INST_RPMS" ] &&
-       ! time dnf -y install $INST_RPMS; then
+       ! time dnf -y install hwloc-1.11.9-3.el8 hwloc-libs-1.11.9-3.el8 hwloc-devel-1.11.9-3.el8; then
+        rc=${PIPESTATUS[0]}
+        dump_repos
+        exit "$rc"
+    fi
+
+    # shellcheck disable=SC2086
+    #if [ -n "$INST_RPMS" ] &&
+    #   ! time dnf -y install openmpi-4.0.3-3.el8 openmpi-devel-4.0.3-3.el8; then
+    #    rc=${PIPESTATUS[0]}
+    #    dump_repos
+    #    exit "$rc"
+    #fi
+
+    # shellcheck disable=SC2086
+    if [ -n "$INST_RPMS" ] &&
+       ! time dnf -y install $INST_RPMS --exclude openmpi* hwloc*; then
         rc=${PIPESTATUS[0]}
         dump_repos
         exit "$rc"

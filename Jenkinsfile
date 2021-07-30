@@ -86,7 +86,7 @@ pipeline {
                defaultValue: '',
                description: 'Package version to use instead of building. example: 1.3.103-1, 1.2-2')
         string(name: 'CI_HARDWARE_DISTRO',
-               defaultValue: 'centos7',
+               defaultValue: 'centos8',
                description: 'Distribution to use for CI Hardware Tests')
         string(name: 'CI_CENTOS7_TARGET',
                defaultValue: 'el7',
@@ -167,7 +167,7 @@ pipeline {
                defaultValue: 'ci_nvme5',
                description: 'Label to use for 5 node NVMe tests')
         string(name: 'CI_NVME_9_LABEL',
-               defaultValue: 'ci_nvme9',
+               defaultValue: 'wolf-51_nvme9',
                description: 'Label to use for 9 node NVMe tests')
         string(name: 'CI_STORAGE_PREP_LABEL',
                defaultValue: '',
