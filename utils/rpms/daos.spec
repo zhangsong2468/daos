@@ -3,7 +3,7 @@
 %define agent_svc_name daos_agent.service
 
 %global mercury_version 2.0.1-1%{?dist}
-%global libfabric_version 1.12.0
+%global libfabric_version 1.13.0
 %global __python %{__python3}
 
 %if (0%{?rhel} >= 8)
@@ -14,7 +14,7 @@
 
 Name:          daos
 Version:       1.3.104
-Release:       4%{?relval}%{?dist}
+Release:       5%{?relval}%{?dist}
 Summary:       DAOS Storage Engine
 
 License:       BSD-2-Clause-Patent
@@ -472,6 +472,9 @@ getent passwd daos_agent >/dev/null || useradd -s /sbin/nologin -r -g daos_agent
 %{_libdir}/libdaos_serialize.so
 
 %changelog
+* Fri Aug 06 2021 Dalton Bohning <daltonx.bohning@intel.com> 1.3.104-5
+- Update to libfabric v1.13.0
+
 * Thu Aug 05 2021 Christopher Hoffman <christopherx.hoffman@intel.com> 1.3.104-4
 - Update conditional statement to include checking for distributions to
   determine which unit files to use for daos-server and daos-agent
