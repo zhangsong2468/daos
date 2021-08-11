@@ -275,12 +275,14 @@ crt_context_provider_create(crt_context_t *crt_ctx, int provider)
 	if (crt_is_service() &&
 	    crt_gdata.cg_auto_swim_disable == 0 &&
 	    ctx->cc_idx == CRT_DEFAULT_PROGRESS_CTX_IDX) {
+#if 0
 		rc = crt_swim_init(CRT_DEFAULT_PROGRESS_CTX_IDX);
 		if (rc) {
 			D_ERROR("crt_swim_init() failed rc: %d.\n", rc);
 			crt_context_destroy(ctx, true);
 			D_GOTO(out, rc);
 		}
+#endif
 	}
 
 	*crt_ctx = (crt_context_t)ctx;
