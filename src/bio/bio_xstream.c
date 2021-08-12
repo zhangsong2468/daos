@@ -97,8 +97,8 @@ bio_spdk_env_init(void)
 	 * Disable DPDK telemetry to avoid socket file clashes and quiet DPDK
 	 * logging by setting level to ERROR.
 	 */
-	opts.env_context = "--log-level=lib.eal:4 --log-level=lib.user1:4"
-		" --no-telemetry";
+	opts.env_context = "--log-level=lib.eal:4 --log-level=user1:4"
+		" --log-level=pmd:4 --no-telemetry";
 
 	rc = spdk_env_init(&opts);
 	if (rc != 0) {
