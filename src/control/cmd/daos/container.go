@@ -27,6 +27,7 @@ import (
 
 /*
 #include "util.h"
+
 */
 import "C"
 
@@ -311,6 +312,7 @@ func (cmd *containerCreateCmd) Execute(_ []string) (err error) {
 			"failed to query new container %s",
 			cmd.contUUID)
 	}
+	defer ci.deleteContainerInfo()
 	if label, set := cmd.Properties.ParsedProps["label"]; set {
 		ci.ContainerLabel = label
 	}
@@ -629,9 +631,10 @@ func (cmd *containerStatCmd) Execute(_ []string) error {
 
 func printContainerInfo(out io.Writer, ci *containerInfo, verbose bool) error {
 	epochs := ci.SnapshotEpochs()
-	epochStrs := make([]string, *ci.NumSnapshots)
-	for i := uint32(0); i < *ci.NumSnapshots; i++ {
-		epochStrs[i] = fmt.Sprintf("%d", epochs[i])
+
+	epochStrs := make([]string, len(epochs))
+	for i, e := range epochs {
+		epochStrs[i] = fmt.Sprintf("%d", e)
 	}
 
 	rows := []txtfmt.TableRow{
@@ -708,8 +711,14 @@ func newContainerInfo(poolUUID, contUUID *uuid.UUID) *containerInfo {
 	ci.RedundancyFactor = (*uint32)(&ci.dci.ci_redun_fac)
 	ci.NumSnapshots = (*uint32)(&ci.dci.ci_nsnapshots)
 	ci.HighestAggregatedEpoch = (*uint64)(&ci.dci.ci_hae)
+	ci.dci.ci_snapshots = (*C.uint64_t)(C.calloc(4096, C.sizeof_uint64_t))
+	ci.dci.ci_nsnapshots = 4096
 
 	return ci
+}
+
+func (ci *containerInfo) deleteContainerInfo() {
+	C.free(unsafe.Pointer(ci.dci.ci_snapshots))
 }
 
 type containerQueryCmd struct {
@@ -729,12 +738,31 @@ func (cmd *containerQueryCmd) Execute(_ []string) error {
 	}
 	defer cleanup()
 
+	// containerInfo is input/output particularly for ci_nsnapshots and ci_snapshots
+	// Scenario 1
+	// if provide ci_snapshots=NULL, ci_nsnapshots will be updated to the number M
+	// returned by the server (actual number of snapshots in the container)
+	// Print routines must not dereference the NULL ci_snapshots pointer
+	//
+	// FIXME / open issue
+	// Scenario 2
+	// if provide ci_snapshots=<ptr_to_allocated_mem_with_N_daos_epoch_t_items> and
+	// ci_nsnapshots=N, server will fill up to N items in ci_snapshots, and will
+	// reply with the value M (causing ci_nsnapshots=M). M may be larger or smaller than N.
+	// Print routines cannot dereference ci_snapshots beyond min(N,M) items.
+	//
+	// something similar would be needed in daos_old cont query if updating that tool
+	// to print the number of snapshots and the snapshots (epoch value)
+
+	// Also to do is adding a placeholder for snapshot names
+
 	ci, err := cmd.queryContainer()
 	if err != nil {
 		return errors.Wrapf(err,
 			"failed to query container %s",
 			cmd.contUUID)
 	}
+	defer ci.deleteContainerInfo()
 
 	if cmd.jsonOutputEnabled() {
 		return cmd.outputJSON(ci, nil)
