@@ -246,8 +246,12 @@ type systemCleanupCmd struct {
 	cfgCmd
 	ctlInvokerCmd
 	jsonOutputCmd
-	Machine string `long:"machine" short:"m" description:"Machine to cleanup"`
-	Verbose bool   `bool:"verbose" short:"v" description:"Output additional cleanup information"`
+
+	Args struct {
+		Machine string `positional-arg-name:"<Machine to cleanup>"`
+	} `positional-args:"yes"`
+
+	Verbose bool `bool:"verbose" short:"v" description:"Output additional cleanup information"`
 }
 
 func (cmd *systemCleanupCmd) Execute(_ []string) (errOut error) {
@@ -262,7 +266,7 @@ func (cmd *systemCleanupCmd) Execute(_ []string) (errOut error) {
 	ctx := context.Background()
 	req := new(control.SystemCleanupReq)
 	req.SetSystem(cmd.config.SystemName)
-	req.Machine = cmd.Machine
+	req.Machine = cmd.Args.Machine
 
 	resp, err := control.SystemCleanup(ctx, cmd.ctlInvoker, req)
 	if err != nil {
