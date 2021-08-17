@@ -44,6 +44,42 @@ daos_handle_t	coh = DAOS_HDL_INVAL;
 /** force cleanup */
 int force;
 
+/** total number of records for progress bar */
+int total_nr;
+
+/** how many ticks in progress bar */
+int ticks;
+
+/** how big each tick is in progress bar */
+int tick_size;
+
+void
+setup_progress()
+{
+	ticks = 20;
+	tick_size = total_nr / ticks;
+	fprintf(autotest_ap->outstream, "    ");
+}
+
+void
+increment_progress(int progress)
+{
+	if (progress % tick_size == 0) {
+		int percentage;
+
+		percentage = (double) progress / (double) total_nr * 100.0;
+		fprintf(autotest_ap->outstream, "\b\b\b\b");
+		fprintf(autotest_ap->outstream, "% 4d", percentage);
+		fflush(autotest_ap->outstream);
+	}
+}
+
+void
+finish_progress()
+{
+	fprintf(autotest_ap->outstream, "\b\b\b\b");
+}
+
 static inline void
 new_oid(void)
 {
@@ -186,6 +222,9 @@ oS1(void)
 	new_oid();
 	daos_obj_generate_oid(coh, &oid, 0, OC_S1, 0, 0);
 
+	total_nr = 1000000;
+	setup_progress();
+
 	for (i = 0; i < 1000000; i++) {
 
 		rc = daos_obj_open(coh, oid, DAOS_OO_RO, &oh, NULL);
@@ -199,8 +238,10 @@ oS1(void)
 			step_fail("failed to close object: %s", d_errdesc(rc));
 			return -1;
 		}
+		increment_progress(i);
 	}
 
+	finish_progress();
 	step_success("");
 	return 0;
 }
@@ -215,6 +256,9 @@ oSX(void)
 	new_oid();
 	daos_obj_generate_oid(coh, &oid, 0, OC_SX, 0, 0);
 
+	total_nr = 10000;
+	setup_progress();
+
 	for (i = 0; i < 10000; i++) {
 
 		rc = daos_obj_open(coh, oid, DAOS_OO_RO, &oh, NULL);
@@ -228,8 +272,10 @@ oSX(void)
 			step_fail("failed to close object: %s", d_errdesc(rc));
 			return -1;
 		}
+		increment_progress(i);
 	}
 
+	finish_progress();
 	step_success("");
 	return 0;
 }
@@ -245,6 +291,9 @@ kv_put(daos_handle_t oh, daos_size_t size, uint64_t nr)
 	uint64_t	i;
 	int		rc;
 	int		eq_rc;
+
+	total_nr = nr;
+	setup_progress();
 
 	/** Create event queue to manage asynchronous I/Os */
 	rc = daos_eq_create(&eq);
@@ -313,6 +362,7 @@ kv_put(daos_handle_t oh, daos_size_t size, uint64_t nr)
 		if (rc) {
 			break;
 		}
+		increment_progress(i);
 	}
 
 	/** Wait for completion of all in-flight requests */
@@ -336,6 +386,7 @@ kv_put(daos_handle_t oh, daos_size_t size, uint64_t nr)
 			rc = eq_rc;
 	}
 
+	finish_progress();
 	return rc;
 }
 
@@ -352,6 +403,9 @@ kv_get(daos_handle_t oh, daos_size_t size, uint64_t nr)
 	uint64_t	res = 0;
 	int		rc;
 	int		eq_rc;
+
+	total_nr = nr;
+	setup_progress();
 
 	/** Create event queue to manage asynchronous I/Os */
 	rc = daos_eq_create(&eq);
@@ -430,6 +484,7 @@ kv_get(daos_handle_t oh, daos_size_t size, uint64_t nr)
 				val_cur, evp);
 		if (rc)
 			break;
+		increment_progress(i);
 	}
 
 	/** Wait for completion of all in-flight requests */
@@ -468,6 +523,7 @@ kv_get(daos_handle_t oh, daos_size_t size, uint64_t nr)
 	if (res != nr * (nr + 1) / 2)
 		rc = -DER_MISMATCH;
 
+	finish_progress();
 	return rc;
 }
 
