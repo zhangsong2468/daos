@@ -570,7 +570,7 @@ Devices
 
 > :warning: **Warning:** CaRT is under heavy development. Use at your own risk.
 
-CaRT is an open-source RPC transport layer for Big Data and Exascale HPC. It supports both traditional P2P RPC delivering and collective RPC which invokes the RPC at a group of target servers with a scalable tree-based message propagating.
+CaRT is an open-source RPC transport layer for Big Data and Exascale HPC. It supports both traditional P2P RPC delivering and **collective RPC which invokes the RPC at a group of target servers with a scalable tree-based message propagating** **(collective RPC: 从服务端的group of targets发起的collective RPC)**.
 
 # Gurt Useful Routines and Types (GURT)
 
