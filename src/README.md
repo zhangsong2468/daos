@@ -1749,7 +1749,9 @@ at create time only, with the default being 1 MB. The array object itself is
 mapped onto a DAOS object with integer dkeys, where each dkey contains
 chunk_size elements. So for example, if we have a file with size 10 bytes, and
 chunk size is 3 bytes, the array object will contain the following:
+	
 (文件的Object，内部是这样的结构)
+
 ~~~~
 Object array
   D-key 0
