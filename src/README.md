@@ -1806,7 +1806,7 @@ Module `rsvc` implements a generic replicated service framework. This file cover
 
 ## Introduction
 
-Certain DAOS RPC services, such as Pool Service (`pool_svc`), and Container Service (`cont_svc`), are replicated using the state machine approach with Raft. Each of these services tolerates the failure of any minority of its replicas. By spreading its replicas across different fault domains, the service can be highly available. Since this replication approach is self-contained in the sense that it requires only local persistent storage and point to point unreliable messaging, but not any external configuration management service, these services are mandatory for bootstrapping DAOS systems as well as managing the configuration of the lighter-weight I/O replication protocol.
+Certain DAOS RPC services, such as Pool Service (`pool_svc`), and Container Service (`cont_svc`), are replicated using the state machine approach with Raft. Each of these services tolerates the failure of any minority of its replicas. By spreading its replicas across different fault domains(Replica跨不同的fault/failure domain), the service can be highly available. Since this replication approach is self-contained in the sense that it requires only local persistent storage and point to point unreliable messaging, but not any external configuration management service, these services are mandatory for bootstrapping DAOS systems as well as managing the configuration of the lighter-weight I/O replication protocol.
 
 ### Architecture
 
