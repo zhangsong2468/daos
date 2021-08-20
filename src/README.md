@@ -1480,7 +1480,10 @@ Before modifications are made, a local transaction, called 'DTX', is started
 on each related shard (both leader and non-leaders) with a client generated
 DTX identifier that is unique for the modification within the container. All
 the modifications in a DTX are logged in the DTX transaction table and back
-references to the table are kept in related modified record.  After local
+references to the table are kept in related modified record.
+（副本也做本地的Transcation，先落日志到transcation table，修改保存在record，
+副本回复leader，leader阻塞等待，收到所有回复后回复client，并标记committable）
+After local
 modifications are done, each non-leader marks the DTX state as 'prepared' and
 replies to the leader. The leader sets the DTX state to 'committable' as soon
 as it has completed its modifications and has received successful replies from
