@@ -1473,6 +1473,8 @@ leader dispatches the RPC to the other related shards, and each shard makes
 its modification in parallel.  Bulk transfers are not forwarded by the leader
 but rather transferred directly from the client, improving load balance and
 decreasing latency by utilizing the full client-server bandwidth.
+(修改元数据的请求update punch object先发给leader shard，leader转发给其余的shards)
+(修改数据的请求bulk transfer在client和shard server之间直接进行)
 
 Before modifications are made, a local transaction, called 'DTX', is started
 on each related shard (both leader and non-leaders) with a client generated
