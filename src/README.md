@@ -1461,6 +1461,7 @@ system with powerful, next generation hardware, maintaining distributed locks
 among multiple, independent application spaces will introduce unacceptable
 overhead and complexity.  DAOS instead uses an optimized two-phase commit
 transaction to guarantee consistency among replicas.
+(使用两段式提交而不是分布式锁，管理数据的一致性；相对于分布式锁，分布式锁的开销在HPC场景不可接受？)
 
 <a id="811"></a>
 ### Single redundancy group based DAOS Two-Phase Commit (DTX)
