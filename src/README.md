@@ -908,7 +908,7 @@ Some KV stores provide versioning support but expect monotonically increasing or
 
 VOS must be able to accept insertion of KV pairs at any epoch and must be able to provide good scalability for concurrent updates and lookups on any key-value object.
 KV objects must also be able to support any type and size of keys and values.
-
+(VOS的KV对象，能支持任一长度的key和value！)
 
 <a id="721"></a>
 
