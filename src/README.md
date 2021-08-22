@@ -924,11 +924,13 @@ Lookup traverses the KV metadata to determine the state of the given key at the 
 If the key is not found at all, a "miss" is returned to indicate that the key is absent from this VOS.
 Otherwise, the value at the near-epoch or greatest epoch less than or equal to the requested epoch is returned.
 If this is the special "punched" value, it means the key was deleted in the requested epoch.
+(Punch:新增一个KV，V是特殊的miss的标记，标记key已经在对应的Epoch被删除)
 The value here refers to the value in the internal tree-data structure.
 The key-value record of the KV-object is stored in the tree as the value of its node.
 So in case of punch this value contains a "special" return code/flag to identify the punch operation.
 
 VOS also supports the enumeration of keys belonging to a particular epoch.
+(Enumeration:批量的用Key找Value)
 
 <a id="723"></a>
 
