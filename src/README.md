@@ -915,9 +915,9 @@ KV objects must also be able to support any type and size of keys and values.
 ### Operations Supported with Key Value Store
 
 VOS supports large keys and values with four types of operations; update, lookup, punch, and key enumeration.
-
+(VOS对象的操作只有4种：更新、查找、删除、列表)
 The update and punch operations add a new key to a KV store or log a new value of an existing key.
-Punch logs the special value "punched", effectively a negative entry, to record the epoch when the key was deleted.
+Punch logs the special value "punched", effectively a negative entry, to record the epoch when the key was deleted.(标记删除，记录EpochOfDelete)
 Sharing the same epoch for both an update and a punch of the same object, key, value, or extent is disallowed, and VOS will return an error when such is attempted.
 
 Lookup traverses the KV metadata to determine the state of the given key at the given epoch.
