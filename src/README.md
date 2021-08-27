@@ -1910,7 +1910,7 @@ Replication ensures high availability of object data because objects are
 accessible while any replica exists. Replication can also increase read
 bandwidth by allowing concurrent reads from different replicas.
 
-#### Server-side Replication
+#### Server-side Replication(默认是Server副本模式)
 (既支持client侧的副本策略，也支持server侧的副本策略)
 DAOS supports server replication, which has stronger consistency of
 replicas with a trade-off in performance and latency. In server replication mode
@@ -1933,13 +1933,14 @@ need not to compare replied pool map version from multiple shard targets, other
 error handing is same as client replication mode described above.
 
 In this mode the conflict writes can be detected and serialized by the leader
-shard server. Now both modes are supported by DAOS, it can be dynamically
+shard server.(leader shard server还负责检测写冲突)
+Now both modes are supported by DAOS, it can be dynamically
 configured by environment variable `DAOS_IO_SRV_DISPATCH` before loading DAOS
 server. By default DAOS works in server replication mode, and if the ENV set as
 zero then will work in client replication mode.
 
-#### Client-side Replication
-
+#### Client-side Replication(可配置的Client副本模式)
+(无一致性保证)
 Client replication is the mode that it is synchronous and fully in the client
 stack, to provide high concurrency and low latency I/O for the upper layer.
 <b>This mode is not default and is only provided for testing purposes,
