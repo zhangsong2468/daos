@@ -1903,7 +1903,7 @@ In addition, checksums can be used with both methods to ensure
 end-to-end data integrity. If checksums discovers silent data corruption,
 the data protection method (replication or erasure codes) might be able
 to recover the data.
-
+(checksum是用于端到端数据完整性校验，能发现silent data corruption)
 ### Replication
 
 Replication ensures high availability of object data because objects are
@@ -1911,9 +1911,12 @@ accessible while any replica exists. Replication can also increase read
 bandwidth by allowing concurrent reads from different replicas.
 
 #### Server-side Replication
-
+(既支持client侧的副本策略，也支持server侧的副本策略)
 DAOS supports server replication, which has stronger consistency of
 replicas with a trade-off in performance and latency. In server replication mode
+(client选择一个leader shard发送IO，然后由leader将IO发送给其他的shard，
+等待其他非leader shard的IO完成，然后统一回复给client)
+(每个shard是由offload xstream来处理IO的request和reply的)
 DAOS client selects a leader shard to send the IO request with the need-to-
 forward shards embedded in the RPC request, when the leader shard gets that IO
 request it handles it as below steps:
