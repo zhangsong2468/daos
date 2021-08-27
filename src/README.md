@@ -1893,7 +1893,8 @@ The object class ID is embedded in object ID. By `daos_obj_generate_id()` user
 can generate an object ID for the specific object class ID. DAOS uses this class
 ID to find the corresponding object class, and then distribute and protect
 object data based on algorithm descriptions of this class.
-
+(oid的高64位包括了最高4位的version bits，12位的feature bits，16位的object class id，
+其余32位是真正的object id)
 ## Data Protection Method
 
 Two types data protection methods supported by DAOS - replication
