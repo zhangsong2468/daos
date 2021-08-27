@@ -1530,7 +1530,7 @@ the DTX model.
 
 <b>Modify multiple replicated object under DTX model</b>
 
-![../../doc/graph/Fig_066.png](../../doc/graph/Fig_066.png ">Modify multiple replicated object under DTX model")
+![https://github.com/zhangsong2468/daos/raw/master/doc/graph/Fig_066.png](https://github.com/zhangsong2468/daos/raw/master/doc/graph/Fig_066.png ">Modify multiple replicated object under DTX model")
 
 <a id="812"></a>
 
