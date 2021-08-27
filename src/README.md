@@ -1813,7 +1813,7 @@ Certain DAOS RPC services, such as Pool Service (`pool_svc`), and Container Serv
 ### Architecture
 
 An RPC service handles incoming _service requests_ (or just _requests_) based on its current _service state_ (or just _state_). To replicate a service is, therefore, to replicate its state so that each request is handled based on the state reached through all prior requests.
-(服务的状态是用Raft协议统一一致保存的)
+(服务的状态是用Raft协议统一一致保存的，这里主要是为了选举Leader)
 The state of a service is replicated with a Raft log. The service transforms requests into state queries and deterministic state updates. All state updates are committed to the Raft log first, before being applied to the state. Since Raft guarantees the consistency among the log replicas, the service replicas end up applying the same set of state updates in the same order and go through identical state histories.
 
 Raft adopts a strong leadership design, so does each replicated service. A service leader of a term is the Raft leader of the same Raft term. Among the replicas of a service, only the leader of the highest term can handle requests. For the server side, the service code is similar to that of a non-replicated RPC service, except for the handling of leadership change events. For the client side, the service requests must be sent to the current leader, which must be searched for if not known already.
