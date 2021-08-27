@@ -2053,6 +2053,7 @@ In the client RPC callback, the client will calculate checksums for the
 
 DAOS supports different data distribution strategies.
 
+	
 ### Single (unstriped) Object
 
 For replication, single (unstriped) object always has one stripe and each
@@ -2060,19 +2061,19 @@ shard of it is a full replica, for Erasure code, single object only has one
 parity group and a shard of it can either be a data chunk or parity chunk
 of the parity group.
 A single (unstriped) object can be either a byte-array or a KV.
-
+(副本：一个shard就是一个完整的副本)
+(EC：一个对象对应一个parity group，group内包含了若干个shard，每个shard要么是data chunk要么是parity chunk)
 ### Fixed Stripe Object
-
+(普通定长条带化Object)(条带属性定义在Object Class里面，能够用于计算Object Layout)
 A fixed stripe object has a constant number of stripes and each stripe has a
 fixed stripe size. These stripe attributes are predefined by object class, DAOS
 uses these attributes to compute object layout.
 
 ### Dynamically Striped Object (Not implemented)
-
+(动态条带化Object)(根据实际物理存储空间和自身大小动态调整条带单元数量)
 A fixed stripe object always has the same number of stripes since it was
 created. In contrast, a dynamically stripped object could be created with a
 single stripe. It will increase its stripe count as its size grows to some
 boundary, to achieve more storage space and better concurrent I/O performance.
 
 Now the dynamically Striped Object is not implemented yet.
-
