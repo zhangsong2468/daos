@@ -1914,7 +1914,7 @@ bandwidth by allowing concurrent reads from different replicas.
 (既支持client侧的副本策略，也支持server侧的副本策略)
 DAOS supports server replication, which has stronger consistency of
 replicas with a trade-off in performance and latency. In server replication mode
-(client选择一个leader shard发送IO，然后由leader将IO发送给其他的shard，
+(client选择一个leader shard发送IO，然后由leader将IO转发给其他的shard，
 等待其他非leader shard的IO完成，然后统一回复给client)
 (每个shard是由offload xstream来处理IO的request和reply的)
 DAOS client selects a leader shard to send the IO request with the need-to-
