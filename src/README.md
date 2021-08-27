@@ -1420,7 +1420,7 @@ The size needed for checksums is included while allocating memory for the persis
 
 The following diagram illustrates the overall VOS layout and where checksums will be stored. Note that the checksum type isn't actually stored in vos_cont_df yet.
 
-![../../doc/graph/Fig_021.png](../../doc/graph/Fig_021.png "How checksum fits into the VOS Layout")
+![https://github.com/zhangsong2468/daos/raw/master/doc/graph/Fig_066.png](https://github.com/zhangsong2468/daos/raw/master/doc/graph/Fig_066.png "How checksum fits into the VOS Layout")
 
 
 ### Checksum VOS Flow (vos_obj_update/vos_obj_fetch)
