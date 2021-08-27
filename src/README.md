@@ -1759,7 +1759,7 @@ chunk_size elements. So for example, if we have a file with size 10 bytes, and
 chunk size is 3 bytes, the array object will contain the following:
 (文件是Array Object，内部有多个Chunks of Cells)
 (文件的Object，内部是这样的结构)
-
+(Array Object的DKey里面只有1个AKey，Key值是NULL，Value是Array of Records)
 ~~~~
 Object array
   D-key 0
