@@ -750,7 +750,7 @@ The VOS relies on a log-based architecture using persistent memory primarily to 
 The actual data can be stored either in persistent memory directly or in block-based NVMe storage.
 The DAOS service has two tiers of storage: Storage Class Memory (SCM) for byte-granular application data and metadata, and NVMe for bulk application data.
 Similar to how PMDK is currently used to facilitate access to SCM, the Storage Performance Development Kit (<a href="https://spdk.io/">SPDK</a>) is used to provide seamless and efficient access to NVMe SSDs.
-The current DAOS storage model involves three DAOS server xstreams per core, along with one main DAOS server xstream per core mapped to an NVMe SSD device.
+The current DAOS storage model involves three DAOS server xstreams per core(每个core有3个'IO'server xstreams), along with one main DAOS server xstream per core mapped to an NVMe SSD device(每个core有1个main server xstreams).
 DAOS storage allocations can occur on either SCM by using a PMDK pmemobj pool, or on NVMe, using an SPDK blob.
 All local server metadata will be stored in a per-server pmemobj pool on SCM and will include all current and relevant NVMe devices, pool, and xstream mapping information.
 Please refer to the <a href="../bio/README.md">Blob I/O</a> (BIO) module for more information regarding NVMe, SPDK, and per-server metadata.
