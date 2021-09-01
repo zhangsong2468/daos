@@ -1037,10 +1037,10 @@ Compared to B+ Tree, rebalancing in red-black trees causes more intrusive tree s
 Furthermore, because B+ Tree nodes contain many slots depending on the size of each node, prefetching in cache can potentially be easier.
 In addition, the sequential computational complexities in the <a href="#7e">Table</a> above show that a B+ Tree-based KV store with a reasonable order, can perform better in comparison to a Red-black tree.
 
-VOS supports enumerating keys valid in a given epoch.
-VOS provides an iterator-based approach to extract all the keys and values from a KV object.
-Primarily, KV indexes are ordered by keys and then by epochs.
-With each key holding a long history of updates, the size of a tree can be huge.
+VOS supports enumerating keys valid in a given epoch.(VOS Tree支持对key+epoch的遍历操作)
+VOS provides an iterator-based approach to extract all the keys and values from a KV object.(VOS Tree也支持从KV对象中提取所有的key和value)
+Primarily, KV indexes are ordered by keys and then by epochs.(VOS Tree内，KV是用key+epoch索引进行排序的)
+With each key holding a long history of updates, the size of a tree can be huge.(VOS Tre，随着更新历史的增加，tree的大小可能很巨大)
 Enumeration with a tree-successors approach can result in an asymptotic complexity of O(m* log (n) + log (n)) with red-black trees, where m is the number of keys valid in the requested epoch.
 It takes O(log2 (n)) to locate the first element in the tree and O(log2 (n)) to locate a successor.
 Because "m" keys need to be retrieved, O( m * log2 (n)) would be the complexity of this enumeration.
